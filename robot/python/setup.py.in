@@ -1,0 +1,68 @@
+#https://github.com/yoctocookbook     
+#https://stackoverflow.com/questions/50678754/included-setup-py-in-bdist-generated-library/50680113#50680113
+from setuptools  import setup, Extension,find_packages
+import os
+
+
+path = "${PROJECT_SOURCE_DIR}/algo/python/Algo"
+
+if os.name == 'nt':
+    name  = "WinAlgoTrade"
+    compile_args=[  ]
+    libs=["shell32", "Kernel32" ,"MSVCRT" ]
+    # due to cmake bug in the string of the path (c:path\to\file) - without "\" after "c:"
+    path = path[:2] + '\\' +path[2:]
+    macro=[('nDEBUG', None), ('WIN32',None) ,('WINDOWS',None) ]
+else:
+    name  = "LinuxAlgoTrade"
+    compile_args=['-g','-O0']
+    libs=['algo_static']  # converted to -lalgo_static
+    macro=[]
+
+Algo_c = Extension("Algo_c", 
+                                 include_dirs=['${PROJECT_SOURCE_DIR}/' ,  '${PROJECT_SOURCE_DIR}/../',  '${CMAKE_SOURCE_DIR}/'  ,'${CMAKE_BINARY_DIR}/','${CMAKE_SOURCE_DIR}/algo'  ,'/usr/lib/python3.9/site-packages/numpy/core/include/'   ],
+                                 extra_compile_args=compile_args,   
+                                 sources= ["${PROJECT_SOURCE_DIR}/algo/python/src/algo.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/strategy.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/strategy_tester.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/tickdata.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/performance_manager.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/tech_indicator.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/model.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/parameter.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/output.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/tag_indicator.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/kfpt.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/sma.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/rsi.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/atr.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/adx.c",
+
+                                           #  "${PROJECT_SOURCE_DIR}/algo/python/src/high.c",
+                                           #   "${PROJECT_SOURCE_DIR}/algo/python/src/low.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/ema.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/macd.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/ohlc.c",
+                                           "${PROJECT_SOURCE_DIR}/algo/python/src/ema_cross.c",
+
+
+                                     ],
+                                 depends=["${CMAKE_BINARY_DIR}/git.h"],                                 
+                                 libraries=libs,
+                                 library_dirs=['${PROJECT_BINARY_DIR}/algo/lib/'],
+                                 define_macros=macro, 
+                                 );
+
+
+#print ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",find_packages(path))
+setup(name=name, ext_modules=[Algo_c],
+       package_dir={'Algo':  path },
+       packages=['Algo.demo','Algo.gui','Algo'],
+       author='Yair Gadelov',
+       author_email='yair.gadelov@gmail.com',
+       setup_requires=['wheel'],
+       install_requires=['PyQt5','requests','flask','flask_io','marshmallow_enum','pyserial' ],
+       version='${PACKAGE_VERSION}',
+       
+      )
+
