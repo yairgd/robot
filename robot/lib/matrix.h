@@ -28,7 +28,9 @@ struct matrix  * matrix_transpose(struct matrix  *mat) ;
 struct matrix * matrix_mul(struct matrix  *a, struct matrix  *b);
 void matrix_free(struct matrix  *matrix);
 void matrix_dump(struct matrix  *matrix);
-struct matrix  *  matrix_inv(struct matrix  *matrix);
+//struct matrix  *  matrix_inv(struct matrix  *matrix);
+int matrix_inv(struct matrix  *matrix);
+
 struct matrix * matrix_pseudo_inv(struct matrix *matrix) ;
 #define MAT(mat,mm,nn) (&mat->data[(mm)*(mat->n) + (nn)])
 

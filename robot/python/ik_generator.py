@@ -42,6 +42,7 @@ def calc_roate_analitic_z(num_of_links):
 
 #xy,grad,J,G = calc_roate_analitic_z(3)
 def calc_roate_analitic_z(num_of_links):
+    import sympy as sym    
     G=np.identity(4);   
     x = sym.symbols('x');
     y = sym.symbols('y');
@@ -78,7 +79,7 @@ def calc_roate_analitic_z(num_of_links):
 def print_J(J):
     for i in range(len(J)):
         for k in range(3):
-            txt = "J[{0}][{1}] = {2}".format(i,k,str(J[i][k]))
+            txt = "*MAT(jacobian,{0},{1}) = {2};".format(i,k,str(J[i][k]))
             print (txt)
 
 def calc_roate_analitic_z(phi,l):
@@ -361,14 +362,16 @@ phi=np.array([0.0001,0.0001,0.0001])
 #phi = np.deg2rad(calc_grdient_decent(link,[xy[0],xy[1],0]))
 xy[1]=xy[1]-0;
 #phi = np.deg2rad(phi)
-while True or k>0:
-    j = ik_jacobian_func_analytic(link ,phi)
-    xy_new=calc_xy_3_analitic(link, phi);
-    #xy_new=[xy_new[0], xy_new[1]]) #, xy_new[0], xy_new[1],xy_new[0], xy_new[1]]
-    delta = (np.linalg.inv(j.transpose()@j)@j.transpose())@np.array(xy-xy_new)
-    #delta = (j@np.linalg.inv(j.transpose()@j))@np.array(xy-xy_new).transpose()
-    phi = phi + delta*0.001
-    if np.linalg.norm(xy_new-xy)<0.001:
+while True:
+
+j = ik_jacobian_func_analytic(link ,phi)
+xy_new=calc_xy_3_analitic(link, phi);
+#xy_new=[xy_new[0], xy_new[1]]) #, xy_new[0], xy_new[1],xy_new[0], xy_new[1]]
+delta = (np.linalg.inv(j.transpose()@j)@j.transpose())@np.array(xy-xy_new)
+#delta = (j@np.linalg.inv(j.transpose()@j))@np.array(xy-xy_new).transpose()
+phi = phi + delta*0.001
+
+    if np.linalg.norm(xy_new-xy)<0.00000000001 or k<0:
         break;
     print(np.rad2deg(phi),xy_new )
     k=k-1

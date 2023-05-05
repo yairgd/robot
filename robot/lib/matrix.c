@@ -59,7 +59,6 @@ void matrix_free(struct matrix  *matrix) {
  */
 struct matrix * matrix_mul(struct matrix  *a, struct matrix  *b) {
 	struct matrix  *c = matrix_init(a->m,b->n);
-
 	memset (c->data, 0 ,c->n * c->m);
 	// multiply matrices
 	for (int i = 0; i < a->m; i++) {
@@ -84,7 +83,7 @@ struct matrix * matrix_mul(struct matrix  *a, struct matrix  *b) {
  */
 struct matrix  * matrix_transpose(struct matrix  *mat) {
 	struct matrix  *mat_t = matrix_init(mat->n,mat->m);
-	
+
 	for (int m=0; m < mat->m; m++) 
 		for (int n=0; n<mat->n; n++) 
 			*MAT(mat_t,n,m) = *MAT(mat,m,n);
@@ -131,6 +130,7 @@ void matrix_diag(struct matrix  *matrix)
 
 }
 
+#if 0
 /**
  * Created  05/03/2023
  * @brief   invers matrix using lapck functions
@@ -157,6 +157,15 @@ struct matrix  * matrix_inv(struct matrix  *matrix) {
 	// and I is a unit matrix
 	dgesv_(&n, &nrhs, A, &lda, ipiv, b, &ldb, &info);
 
+	//dgetri_(&n, &nrhs, A, &lda, ipiv, x, &ldb, &info);
+
+	//dgetri_(&n, &A, &lda, &ipiv, x, &ldb, info);
+
+
+
+	//	int dgetri_(integer *n, doublereal *a, integer *lda, integer 
+	//	*ipiv, doublereal *work, integer *lwork, integer *info)
+
 	if(info == 0) {
 		// inversion on
 	} else {
@@ -165,6 +174,25 @@ struct matrix  * matrix_inv(struct matrix  *matrix) {
 
 	return matrix_i;
 }
+
+#else
+
+int matrix_inv(struct matrix  *matrix) {
+	struct matrix  *matrix_i =  matrix_init(matrix->n,matrix->m);
+	integer N = matrix->n;
+	integer * IPIV = malloc (sizeof (int) * N);
+	integer LWORK = N*N;
+	doublereal *WORK = malloc (sizeof (double) * LWORK);
+	integer INFO;
+	doublereal *WORK1 = malloc (sizeof (double) * LWORK);
+	doublereal *A = matrix->data;
+
+	dgetrf_(&N,&N,A,&N,IPIV,&INFO,WORK1);
+	dgetri_(&N,A,&N,IPIV,WORK,&LWORK,&INFO);
+	return INFO;
+}
+
+#endif
 
 
 /**
@@ -176,13 +204,15 @@ struct matrix  * matrix_inv(struct matrix  *matrix) {
 struct matrix * matrix_pseudo_inv(struct matrix *matrix) {	
 	struct matrix * matrix_t = matrix_transpose (matrix); // matrix_transpose = tranpose of matrix	
 	struct matrix * matrix_m = matrix_mul(matrix_t,matrix);  // matrix_mul = matrix_transpose * matrix
-	struct matrix  * matrix_i =  matrix_inv (matrix_m); // matrix_i = inv(matrix_mul)
-	struct matrix * matrix_pseudo_inv =  matrix_mul (matrix_i,matrix_t); // matrix_i = inv(matrix_mul)
+								 //struct matrix  * matrix_i =  matrix_inv (matrix_m); // matrix_i = inv(matrix_mul)
+	int ok = matrix_inv (matrix_m); // -> matrix_m = inv(matrix_m)
+	struct matrix * matrix_pseudo_inv =  matrix_mul (matrix_m,matrix_t); // matrix_i = inv(matrix_mul)
 
-	matrix_free(matrix_i);
+	//matrix_free(matrix_i);
 	matrix_free(matrix_t);
 	matrix_free(matrix_m);
 
 	return matrix_pseudo_inv;
 
 }
+

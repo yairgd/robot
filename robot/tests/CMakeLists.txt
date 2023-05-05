@@ -1,5 +1,9 @@
 set (ik_SRC 
 	./ik.c
+	#../../Lapack/Scr/dgetri.c
+	#../../Lapack/Scr/dtrtri.c
+	#../../Lapack/Scr/dtrti2.c
+
 )
 
 
