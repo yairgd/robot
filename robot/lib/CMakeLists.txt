@@ -1,5 +1,6 @@
 set ( robot_SRC 
 	./matrix.c
+	./optim.c
 )
 
 
