@@ -32,9 +32,6 @@
 
 #include "IShape.h"
 
-// screen dimensions
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
 
 //class IShape;
 class Screen : public IShape {
@@ -48,9 +45,9 @@ class Screen : public IShape {
 
 
 	public:
-	Screen() {
+	Screen(int width, int height) {
 		SDL_Init(SDL_INIT_VIDEO);
-		SDL_CreateWindowAndRenderer(640*2,480*2,0,&window, &renderer);
+		SDL_CreateWindowAndRenderer(width,height,0,&window, &renderer);
 		SDL_RenderSetScale(renderer,2,2);
 #if 0
 		// create window and renderer
@@ -76,6 +73,14 @@ class Screen : public IShape {
 		for (auto & point: points) {
 			SDL_RenderDrawPointF(renderer, point.x, point.y);
 		}
+
+// draw x axis
+ //   SDL_RenderDrawLine(renderer, 0, 240, 640, 240);
+
+    // draw y axis
+   // SDL_RenderDrawLine(renderer, 340, 0, 340, 480);
+
+    
 		SDL_RenderPresent(renderer);	
 	}
 
@@ -84,6 +89,7 @@ class Screen : public IShape {
 	}
 
 	void line(float x1, float y1, float x2, float y2){
+#if 1
 		float dx = x2 - x1;
 		float dy = y2 - y1;
 
@@ -93,6 +99,9 @@ class Screen : public IShape {
 		for (float i = 0; i < length; i++) {
 			pixel(x1+std::cos(angle) * i,y1+std::sin(angle) * i);
 		}
+#endif
+		//SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+
 	}
 
 	void addShape(std::shared_ptr<IShape> shape ) {

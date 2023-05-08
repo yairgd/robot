@@ -20,30 +20,54 @@
 #include <iostream>
 #include <memory>
 
-#include "cube.h"
+#include "robot.h"
 
 #include "screen.h"
 
-
+#include "CoordinateSystem.h"
 
 
 void Robot::update(IShape   * screen )   {
-	int k=0;
-	for (auto &p : points) {
-		p.x -= c.x;
-		p.y -= c.y;
-		p.z -= c.z;
-		rotate(p,0.01,0.05,0.05);
-		p.x += c.x;
-		p.y += c.y;
-		p.z += c.z;
-
-	}
-
 	auto s = reinterpret_cast<Screen *>(screen);
-	for (auto & conn: connectios) {
-		s->line(points[conn.a].x , points[conn.a].y, points[conn.b].x , points[conn.b].y);
-	}
+	
+	CoordinateSystem cs(s, 150,150,300,300);
+
+	calc_grdient_decent(phi,links, des_xyz,0.001);
+	//jacobian_pseudoinverse_optimization(phi,links, des_xyz,3,0.001);
+
+	
+	double *alpha=0;
+	double *beta=0;
+	//double gamma[] =  {0, 0.401455, 0.666982};
+	float x0 = 100;
+	float y0 = 100;
+
+
+
+	forward_kinematic(links,alpha, beta , phi, xyz, 3) ;
+	des_xyz[0] = xyz[2].x;
+	des_xyz[1] = xyz[2].y;
+	des_xyz[2] = xyz[2].z;
+
+	
+
+//	for (int i = 0; i < 3; i++) {
+//		xyz[i].x = xyz[i].x*20 + x0;
+//		xyz[i].y = xyz[i].y*20 + y0;
+//	}
+
+//	printf("%lf %lf %lf\n",xyz[2].x,xyz[2].y,xyz[2].z);
+	cs.pixel(0,0);	
+	cs.pixel(xyz[0].x,xyz[0].y);
+	cs.pixel(xyz[1].x,xyz[1].y);
+	cs.pixel(xyz[2].x,xyz[2].y);
+
+	cs.line(0,0, xyz[0].x,xyz[0].y);
+	cs.line(xyz[0].x,xyz[0].y, xyz[1].x,xyz[1].y);
+	cs.line(xyz[1].x,xyz[1].y, xyz[2].x,xyz[2].y);
+
+	cs.grid();
+
 }
 
 

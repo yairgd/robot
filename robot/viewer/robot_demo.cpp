@@ -20,23 +20,19 @@
 #include <iostream>
 #include <memory>
 
-#include "cube.h"
+#include "robot.h"
 #include "screen.h"
 
 
 
 
 int main(int argc, char* argv[]) {
-	Screen screen(640,480);;
+	Screen screen(640*2,480*2);
 	SDL_Event event;
 	
-	auto cube = std::make_shared<Cube>();
-	auto cube1 = std::make_shared<Cube>();
-	auto cube2 = std::make_shared<Cube>();
+	auto robot = std::make_shared<Robot>();
 
-	screen.addShape(cube);
-	screen.addShape(cube1);
-	screen.addShape(cube2);
+	screen.addShape(robot);
 
 	while (true) {
 		screen.show();

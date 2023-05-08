@@ -14,31 +14,41 @@ target_include_directories(cube PRIVATE
 
 target_link_libraries(cube PRIVATE
 	SDL2	
+	robot
+	
 )
 
 
 
 
 
-set ( viewer_SRC 
-	./main.cpp
+set ( robot_demo_SRC 
+	./robot.cpp
+	./screen.cpp
+	./robot_demo.cpp
+	./CoordinateSystem.cpp
+
 
 )
 
-add_executable(viewer 
-	${viewer_SRC}
+add_executable(robot_demo
+	${robot_demo_SRC}
 )
 
 
 
 
-target_include_directories(viewer PUBLIC 
+target_include_directories(robot_demo PUBLIC 
 	./	
 )
 
 
-target_link_libraries(viewer PUBLIC
-	SDL2	
+target_link_libraries(robot_demo PUBLIC
+	-Wl,--start-group  		
+	SDL2
+	robot
+	-Wl,--end-group
+	
 )
 
 

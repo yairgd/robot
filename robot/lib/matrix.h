@@ -18,6 +18,10 @@
 
 #ifndef MATRIX_H
 #define MATRIX_H
+struct vec3 
+{
+	double  x,y,z;
+};
 struct matrix {
 	double *data;
 	int m,n;
@@ -30,6 +34,14 @@ void matrix_free(struct matrix  *matrix);
 void matrix_dump(struct matrix  *matrix);
 //struct matrix  *  matrix_inv(struct matrix  *matrix);
 int matrix_inv(struct matrix  *matrix);
+
+struct matrix  *  matrix_rotation_z(double gama);
+struct matrix  *  matrix_diag(int m);
+struct matrix  *  matrix_translation_z(double gama, double link);
+struct matrix  *  matrix_rotation_x(double gama);
+struct matrix  *  matrix_rotation_y(double beta);
+struct matrix  *  matrix_rotation_z(double alpha);
+struct matrix  *  matrix_copy(struct matrix *matrix);
 
 struct matrix * matrix_pseudo_inv(struct matrix *matrix) ;
 #define MAT(mat,mm,nn) (&mat->data[(mm)*(mat->n) + (nn)])

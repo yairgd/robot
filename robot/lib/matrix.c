@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "clapack.h"
 
@@ -33,6 +34,7 @@ struct matrix  * matrix_init(int m, int n) {
 	mat->n = n;
 	mat->m = m;
 	mat->data = malloc(sizeof(double)*m*n);
+	memset (mat->data, 0 ,sizeof(double)*m*n);
 	return mat;
 }
 
@@ -118,17 +120,94 @@ void matrix_dump(struct matrix  *matrix)
  * Created  05/03/2023
  * @brief   creates  diagonal and unit matrix
  * @param   
- * @return  
+ * @return diagonal matix 
  */
-void matrix_diag(struct matrix  *matrix)
+struct matrix  *  matrix_diag(int m)
 {
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
-	memset (matrix->data, 0, matrix->n * matrix->m);
-	for (int i = 0; i < MIN(matrix->n,matrix->m) ; i++) {
+	struct matrix  *matrix = matrix_init(m,m);
+	
+	memset (matrix->data, 0, m * m);
+	for (int i = 0; i < m ; i++) {
 		*MAT(matrix,i,i) = 1;
 	}
-
+	return matrix;
 }
+
+
+/**
+ * Created  05/07/2023
+ * @brief   returns rotation matix around  z axis
+ * @param   gama rotation angle around z
+ * @return  
+ */
+struct matrix  *  matrix_rotation_z(double gama)
+{
+	struct matrix  *matrix = matrix_diag(3);
+	*MAT(matrix,0,0) = cos(gama); *MAT(matrix,0,1) = -sin(gama);
+	*MAT(matrix,1,0) = sin(gama); *MAT(matrix,1,1) =  cos(gama);	
+	return matrix;
+}
+
+
+/**
+ * Created  05/07/2023
+ * @brief   returns rotation matix around y axis
+ * @param   gama rotation angle around y
+ * @return  
+ */
+struct matrix  *  matrix_rotation_y(double beta)
+{
+	struct matrix  *matrix = matrix_diag(3);
+	*MAT(matrix,0,0) =  cos(beta); *MAT(matrix,0,2) =  sin(beta);
+	*MAT(matrix,2,0) = -sin(beta); *MAT(matrix,2,2) =  cos(beta);	
+	return matrix;
+}
+
+
+/**
+ * Created  05/07/2023
+ * @brief   returns rotation matix around y axis
+ * @param   gama rotation angle around y
+ * @return  
+ */
+struct matrix  *  matrix_rotation_x(double alpha)
+{
+	struct matrix  *matrix = matrix_diag(3);
+	*MAT(matrix,1,1) = cos(alpha); *MAT(matrix,1,2) = -sin(alpha);
+	*MAT(matrix,2,1) = sin(alpha); *MAT(matrix,2,2) =  cos(alpha);
+	return matrix;
+}
+
+
+/**
+ * Created  05/07/2023
+ * @brief   roation and traslation matrix
+ * @param   rpy - ray, yaw pitch angles
+ * @return  
+ */
+struct matrix  *  matrix_translation_z(double gama, double link)
+{
+	int i,j;
+	struct matrix  * h = matrix_diag(4);
+	struct matrix  * rot_z = matrix_rotation_z(gama);
+
+	/* copy the roation matirx */
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			*MAT(h,i,j) = *MAT(rot_z,i,j);
+		}
+	}
+
+	/* copy translation vector */
+	*MAT(h, 0,3) = link * cos(gama);
+	*MAT(h, 1,3) = link * sin(gama);
+	*MAT(h, 2,3) = 0;
+
+	matrix_free(rot_z);
+	return h;
+}
+
 
 #if 0
 /**
@@ -215,4 +294,17 @@ struct matrix * matrix_pseudo_inv(struct matrix *matrix) {
 	return matrix_pseudo_inv;
 
 }
+
+
+struct matrix  *  matrix_copy(struct matrix *matrix)
+{
+	struct matrix  *new_matrix = matrix_init(matrix->n, matrix->m);
+	for (int m = 0; m < matrix->m; m++) {
+		for (int n = 0; n < matrix->n; n++) {
+			*MAT(new_matrix, n, m) = *MAT(matrix, n,m);
+		}
+	}
+	return new_matrix;
+}
+
 

@@ -52,37 +52,23 @@ class Cube: public IShape {
 				{ 3, 7 },
 		};
 
-		vec3 c{0,0,0};
 
 	public:
 		Cube () {
 			float a = rand() % 200 ;
 			float b = a +100;
 			
-			points.push_back({ a, a, a });
-			points.push_back({ b, a, a });
-			points.push_back({ b, b, a });
-			points.push_back({ a, b, a });
-
-			points.push_back({ a, a, b });
-			points.push_back({ b, a, b });
-			points.push_back({ b, b, b });
-			points.push_back({ a, b, b });
-
-
-#if 0
-			points = std::vector {
+			points = std::vector<vec3> {
 				{ a, a, a },
-					{ b, a, a },
-					{ b, b, a },
-					{ a, b, a },
+				{ b, a, a },
+				{ b, b, a },
+				{ a, b, a },
 
-					{ a, a, b },
-					{ b, a, b },
-					{ b, b, b },
-					{ a, b, b }	
+				{ a, a, b },
+				{ b, a, b },
+				{ b, b, b },
+				{ a, b, b }	
 			};
-#endif
 
 			findCentroid();
 		 }

@@ -22,6 +22,7 @@
 #include <vector>
 #include "screen.h"
 #include "IShape.h"
+#include "optim.h"
 
 
 class Robot: public IShape {
@@ -33,138 +34,101 @@ class Robot: public IShape {
 
 
 		std::vector<vec3> points; 
-		std::vector<connection> connectios{
-			{ 0, 1 },
-				{ 1, 2 },
-				{ 2, 3 },
-				{ 3, 0 },
-				{ 4, 5 },
-				{ 5, 6 },
-				{ 6, 7 },
-				{ 7, 4 },
-				{ 0, 4 },
-				{ 1, 5 },
-				{ 2, 6 },
-				{ 3, 7 },
-		};
+		std::vector<connection> connectios;
 
-		vec3 c{0,0,0};
+		double des_xyz[3] = { 12.411930818340064, 7.603239324984113,0};
+		double links[3]={4.0,6.0,6.0};
+		vec3 xyz[3]={0};
+
+		//double phi[] = {0.000000, 0.401455, 0.666982};
+
+		double phi[3] = {0.000000, 0.401455, 0.666982};
+
 
 	public:
 		Robot () {
-			float a = rand() % 200 ;
-			float b = a +100;
-			
-			points.push_back({ a, a, a });
-			points.push_back({ b, a, a });
-			points.push_back({ b, b, a });
-			points.push_back({ a, b, a });
-
-			points.push_back({ a, a, b });
-			points.push_back({ b, a, b });
-			points.push_back({ b, b, b });
-			points.push_back({ a, b, b });
-
-
-#if 0
-			points = std::vector {
-				{ a, a, a },
-					{ b, a, a },
-					{ b, b, a },
-					{ a, b, a },
-
-					{ a, a, b },
-					{ b, a, b },
-					{ b, b, b },
-					{ a, b, b }	
-			};
-#endif
 
 			// Calaculate centroid
-			for (auto & p : points) {
-				c.x += p.x;
-				c.y += p.y;
-				c.z += p.z;
-			}
-			c.x /= points.size();
-			c.y /= points.size();
-			c.z /= points.size();
+			//findCentroid();
 		}
 
 		void processEvent(SDL_Event  * event) override {
 			//while (SDL_PollEvent(event)) 
 			//{
-				switch (event->type)
-				{
-					case SDL_QUIT: 
-						SDL_Quit();
-						exit(0);
-						break;
-					case SDL_MOUSEBUTTONDOWN:
-						if (event->button.button == SDL_BUTTON_LEFT)
+			switch (event->type)
+			{
+				case SDL_KEYDOWN:
+					{
+						switch(event->key.keysym.sym)
 						{
-							isDragging = true;
-							prevX = event->button.x;
-							prevY = event->button.y;
-							//if (x >= buttonRect.x && x <= buttonRect.x + buttonRect.w && y >= buttonRect.y && y <= buttonRect.y + buttonRect.h) {
-							printf("Button clicked! %d %d\n",prevX,prevY);
 
+							case SDLK_UP:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Up was pressed");
+								des_xyz[1] +=0.1;
+							//	printf("inrease !!\n");
+								      break;
+							case SDLK_DOWN:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Down was pressed");
+								//printf("decrease !!\n");								       // 
+								       des_xyz[1] -=0.1;
+									break;
+							case SDLK_LEFT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Left was pressed");
+								des_xyz[0] -=0.1;									
+									break;
+							case SDLK_RIGHT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Right was pressed");
+								des_xyz[0] +=0.1;									
+									 break;
+							default:;
 						}
+					printf("%lf %lf %lf\n",xyz[2].x,xyz[2].y,xyz[2].z);
+						
 						break;
-							case SDL_MOUSEBUTTONUP:
-						if (event->button.button == SDL_BUTTON_LEFT)
-						{
-							isDragging = false;
-						}
-						break;
-							case SDL_MOUSEMOTION:
-						if (isDragging)
-						{
-							int currX = event->motion.x;
-							int currY = event->motion.y;
-							int dx = currX - prevX;
-							int dy = currY - prevY;
-							// do something with dx and dy
-							prevX = currX;
-							prevY = currY;
-							printf("Mouse drag! %d %d\n",dx,dy);
-
-						}
-						break;
-						}
-				//}
+					}
+				case SDL_QUIT: 
+					SDL_Quit();
+					exit(0);
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event->button.button == SDL_BUTTON_LEFT)
+					{
+						isDragging = true;
+						prevX = event->button.x;
+						prevY = event->button.y;
+						//if (x >= buttonRect.x && x <= buttonRect.x + buttonRect.w && y >= buttonRect.y && y <= buttonRect.y + buttonRect.h) {
+						//printf("Button clicked! %d %d\n",prevX,prevY);
 
 
-			}
+
+					}
+					break;
+						case SDL_MOUSEBUTTONUP:
+					if (event->button.button == SDL_BUTTON_LEFT)
+					{
+						isDragging = false;
+					}
+					break;
+						case SDL_MOUSEMOTION:
+					if (isDragging)
+					{
+						int currX = event->motion.x;
+						int currY = event->motion.y;
+						int dx = currX - prevX;
+						int dy = currY - prevY;
+						// do something with dx and dy
+						prevX = currX;
+						prevY = currY;
+				//		printf("Mouse drag! %d %d\n",dx,dy);
+						
+
+					}
+					break;
+					}
+					//}
 
 
-			void rotate(vec3& point, float x = 0, float y = 0, float z = 0) {
-				float cx = std::cos(x);
-				float sx = std::sin(x);
-				float cy = std::cos(y);
-				float sy = std::sin(y);
-				float cz = std::cos(z);
-				float sz = std::sin(z);
-
-				// rotate around x-axis
-				float py = point.y * cx - point.z * sx;
-				float pz = point.y * sx + point.z * cx;
-
-				// rotate around y-axis
-				float px = point.x * cy + pz * sy;
-				pz = -point.x * sy + pz * cy;
-
-				// rotate around z-axis
-				float px2 = px * cz - py * sz;
-				float py2 = px * sz + py * cz;
-
-				point.x = px2;
-				point.y = py2;
-				point.z = pz;
-			}
+		}
 
 
-			void update(IShape * shape ) override ;	
+
+		void update(IShape * shape ) override ;	
 		};
 
 
