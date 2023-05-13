@@ -20,6 +20,7 @@
 #include <iostream>
 #include <memory>
 
+#include "ShapeObject.h"
 #include "cube.h"
 #include "screen.h"
 
@@ -27,22 +28,25 @@
 
 
 int main(int argc, char* argv[]) {
-	Screen screen(640,480);;
+	Screen screen(640*2,480*2);;
 	SDL_Event event;
 	
-	auto cube = std::make_shared<Cube>();
-	auto cube1 = std::make_shared<Cube>();
-	auto cube2 = std::make_shared<Cube>();
+	std::shared_ptr<IShape> cube = std::make_shared<Cube>();
+	auto shapes = std::vector<std::shared_ptr<IShape>>({cube});
+	auto shapeObject = std::make_shared<ShapeObject>(shapes);
+	shapeObject->setPosition(320,240);
+	shapeObject->setScale(1);
 
-	screen.addShape(cube);
-	screen.addShape(cube1);
-	screen.addShape(cube2);
-
+	screen.addShapeObject(shapeObject);
+	
+	double x=0,y=0,z=0;
 	while (true) {
 		screen.show();
 		screen.clear();
 		screen.processEvent(&event);
-		screen.update();
+		screen.draw();
+		//shapeObject->setRotationAngle(x+=0.001,y+=0.001,z+=0.001);
+		shapeObject->rotate(0.1, 0.1, z+=0.001);		
 		SDL_Delay(30);
 	}	
 }

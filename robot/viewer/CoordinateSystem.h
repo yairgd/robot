@@ -21,23 +21,23 @@
 #include "screen.h"
 class CoordinateSystem {
 	public:
-	CoordinateSystem(Screen * screen, int x, int y, int width, int height):
-		m_screen(screen),m_x(x), m_y(y), m_width(width), m_height(height), scale(10){};
+	CoordinateSystem(Screen * screen, int x, int y, int width, int height,double scale):
+		m_screen(screen),m_x(x), m_y(y), m_width(width), m_height(height), m_scale(scale){};
 
 	void pixel(float x, float y) {
 		y=-y;
-		x = m_x * scale  + m_width/2;
-		y = m_y * scale + m_height/2;
+		x = x * m_scale  + m_x;
+		y = y * m_scale + m_y;
 
 		m_screen->pixel(x,y);
 	}
 	void line(float x1, float y1, float x2,float y2) {
 		y1=-y1;
 		y2=-y2;
-		x1 = x1 * scale + m_x + m_width/2;
-		y1 = y1 * scale + m_y + m_width/2;
-		x2 = x2 * scale + m_x + m_width/2;
-		y2 = y2 * scale + m_y + m_width/2;
+		x1 = x1 * m_scale + m_x ;
+		y1 = y1 * m_scale + m_y ;
+		x2 = x2 * m_scale + m_x ;
+		y2 = y2 * m_scale + m_y ;
 		
 		m_screen->line(x1,y1,x2,y2);
 	}
@@ -58,7 +58,7 @@ class CoordinateSystem {
 		double m_x, m_y;
 		int m_width, m_height;
 		Screen *m_screen;
-		double scale = 20;
+		double m_scale = 20;
 };
 #endif
 

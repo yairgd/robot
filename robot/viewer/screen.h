@@ -30,15 +30,15 @@
 #include <memory>
 
 
-#include "IShape.h"
+#include "ShapeObject.h"
 
 
 //class IShape;
-class Screen : public IShape {
+class Screen  {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	std::vector<SDL_FPoint> points;
-	std::vector<std::shared_ptr<IShape>> shapes;
+	std::vector<std::shared_ptr<ShapeObject>> m_shapeObjects;
 
 	int prevX = 0, prevY = 0;
 	bool isDragging = false;
@@ -62,6 +62,11 @@ class Screen : public IShape {
 #endif
 
 	}
+
+	//std::vector< vec3 > getPoints() override {
+	//		return points;
+	//	}	
+	
 	void pixel(float x, float y) {
 		points.push_back({x,y});
 	}
@@ -104,14 +109,14 @@ class Screen : public IShape {
 
 	}
 
-	void addShape(std::shared_ptr<IShape> shape ) {
-		shapes.push_back(shape);
+	void addShapeObject(std::shared_ptr<ShapeObject> shapeObject ) {
+		m_shapeObjects.push_back(shapeObject);
 	}
 
-	void update(IShape * shape = nullptr) override ;
+	void draw()  ;
 
 
-	void processEvent(SDL_Event  * event = nullptr  ) override;
+	void processEvent(SDL_Event  * event = nullptr  ) ;
 };
 
 

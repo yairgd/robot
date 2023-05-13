@@ -22,18 +22,27 @@
 void Screen::processEvent(SDL_Event  * event) 
 {
 	while (SDL_PollEvent(event)) {
-		for ( auto s : shapes) {
+		switch (event->type) {
+			{
+				case SDL_QUIT: 
+					SDL_Quit();
+					exit(0);
+					break;
+			}
+		}
+		for ( auto s : m_shapeObjects) {
 			s->processEvent(event);
 		}
+
 	}
 
 }
 
 
-void Screen::update(IShape * shape) 
+void Screen::draw() 
 {
-	for ( auto s : shapes) {
-		s->update(this);
+	for ( auto s : m_shapeObjects) {
+		s->draw(this);
 	}
 
 }

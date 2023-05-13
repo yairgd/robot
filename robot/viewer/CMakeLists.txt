@@ -2,6 +2,9 @@ set ( cube_SRC
 	./cube.cpp
 	./screen.cpp
 	./cube_demo.cpp
+	./ShapeObject.cpp	
+	./IShapeObjectBase.cpp
+	./AxisObject.cpp
 )
 add_executable(cube 
 	${cube_SRC}
@@ -27,6 +30,10 @@ set ( robot_demo_SRC
 	./screen.cpp
 	./robot_demo.cpp
 	./CoordinateSystem.cpp
+	./ShapeObject.cpp
+	./IShapeObjectBase.cpp
+	./cube.cpp
+	./AxisObject.cpp
 
 
 )

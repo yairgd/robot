@@ -27,10 +27,10 @@
 #include "CoordinateSystem.h"
 
 
-void Robot::update(IShape   * screen )   {
-	auto s = reinterpret_cast<Screen *>(screen);
+void Robot::update( )   {
+	//auto s = reinterpret_cast<Screen *>(screen);
 	
-	CoordinateSystem cs(s, 150,150,300,300);
+	//CoordinateSystem cs(s, 150,150,300,300);
 
 	calc_grdient_decent(phi,links, des_xyz,0.001);
 	//jacobian_pseudoinverse_optimization(phi,links, des_xyz,3,0.001);
@@ -39,8 +39,8 @@ void Robot::update(IShape   * screen )   {
 	double *alpha=0;
 	double *beta=0;
 	//double gamma[] =  {0, 0.401455, 0.666982};
-	float x0 = 100;
-	float y0 = 100;
+//	float x0 = 100;
+//	float y0 = 100;
 
 
 
@@ -48,7 +48,7 @@ void Robot::update(IShape   * screen )   {
 	des_xyz[0] = xyz[2].x;
 	des_xyz[1] = xyz[2].y;
 	des_xyz[2] = xyz[2].z;
-
+#if 0
 	
 
 //	for (int i = 0; i < 3; i++) {
@@ -67,7 +67,7 @@ void Robot::update(IShape   * screen )   {
 	cs.line(xyz[1].x,xyz[1].y, xyz[2].x,xyz[2].y);
 
 	cs.grid();
-
+#endif
 }
 
 

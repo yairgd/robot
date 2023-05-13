@@ -33,7 +33,7 @@ class Robot: public IShape {
 		bool isDragging;
 
 
-		std::vector<vec3> points; 
+		std::vector<point> points; 
 		std::vector<connection> connectios;
 
 		double des_xyz[3] = { 12.411930818340064, 7.603239324984113,0};
@@ -48,9 +48,47 @@ class Robot: public IShape {
 	public:
 		Robot () {
 
+			points.clear();
+			points = std::vector<point> {
+				{{ 0,0,0 },{0,0,0}},
+				{{ 0,0,0 },{0,0,0}},
+				{{ 0,0,0 },{0,0,0}},
+				{{ 0,0,0 },{0,0,0}},
+			};
+
+	
+			connectios = std::vector<connection> {
+				{ 0, 1 },
+				{ 1, 2 },
+				{ 2, 3 },
+			};
+
+		//	points.push_back({{0,0,0},{0,0,0}});
+		//	points.push_back({{0,0,0},{0,0,0}});
+		//	points.push_back({{0,0,0},{0,0,0}});
+		//	points.push_back({{0,0,0},{0,0,0}});
+
 			// Calaculate centroid
 			//findCentroid();
 		}
+		virtual std::vector< point > &  getPoints() override {
+			calc_grdient_decent(phi,links, des_xyz,0.001);
+			//jacobian_pseudoinverse_optimization(phi,links, des_xyz,3,0.001);
+
+			double *alpha=0;
+			double *beta=0;
+
+			forward_kinematic(links,alpha, beta , phi, xyz, 3) ;
+			des_xyz[0] = xyz[2].x;
+			des_xyz[1] = xyz[2].y;
+			des_xyz[2] = xyz[2].z;
+			//ints.clear();
+			//ints.push_back({0,0,0},{0,0,0}};
+			for (int i =0; i < 3; i++) {
+				points[i+1].src = xyz[i];
+			}
+			return points;
+		}		
 
 		void processEvent(SDL_Event  * event) override {
 			//while (SDL_PollEvent(event)) 
@@ -64,28 +102,25 @@ class Robot: public IShape {
 
 							case SDLK_UP:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Up was pressed");
 								des_xyz[1] +=0.1;
-							//	printf("inrease !!\n");
-								      break;
+								//	printf("inrease !!\n");
+								break;
 							case SDLK_DOWN:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Down was pressed");
-								//printf("decrease !!\n");								       // 
-								       des_xyz[1] -=0.1;
-									break;
+								       //printf("decrease !!\n");								       // 
+								des_xyz[1] -=0.1;
+								break;
 							case SDLK_LEFT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Left was pressed");
 								des_xyz[0] -=0.1;									
-									break;
+								break;
 							case SDLK_RIGHT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Right was pressed");
 								des_xyz[0] +=0.1;									
-									 break;
+								break;
 							default:;
 						}
-					printf("%lf %lf %lf\n",xyz[2].x,xyz[2].y,xyz[2].z);
-						
+						printf("%lf %lf %lf\n",xyz[2].x,xyz[2].y,xyz[2].z);
+
 						break;
 					}
-				case SDL_QUIT: 
-					SDL_Quit();
-					exit(0);
-					break;
+
 				case SDL_MOUSEBUTTONDOWN:
 					if (event->button.button == SDL_BUTTON_LEFT)
 					{
@@ -115,8 +150,8 @@ class Robot: public IShape {
 						// do something with dx and dy
 						prevX = currX;
 						prevY = currY;
-				//		printf("Mouse drag! %d %d\n",dx,dy);
-						
+						//		printf("Mouse drag! %d %d\n",dx,dy);
+
 
 					}
 					break;
@@ -127,8 +162,10 @@ class Robot: public IShape {
 		}
 
 
-
-		void update(IShape * shape ) override ;	
+		virtual std::vector< connection > &  getConnections() override{
+			return connectios;
+		}
+		void update() override ;	
 		};
 
 

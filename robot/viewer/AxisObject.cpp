@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  main.cpp
+ *       Filename:  AxisObject.cpp
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  05/05/2023 03:54:18 PM
+ *        Created:  05/13/2023 09:22:40 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,22 +15,11 @@
  *
  * =====================================================================================
  */
-#include <SDL2/SDL.h>
-
-#include <iostream>
-#include <memory>
-
-#include "cube.h"
-
-#include "screen.h"
+#include "AxisObject.h"
 
 
-
-
-void Cube::update( )   {
-
+void AxisObject::draw(Screen *scr) {
+	
+};
+void AxisObject::findCentroid() {
 }
-
-
-
-

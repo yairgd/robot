@@ -21,6 +21,10 @@
 #include <memory>
 
 #include "robot.h"
+#include "cube.h"
+#include "AxisShape.h"
+#include "ShapeObject.h"
+
 #include "screen.h"
 
 
@@ -30,15 +34,35 @@ int main(int argc, char* argv[]) {
 	Screen screen(640*2,480*2);
 	SDL_Event event;
 	
-	auto robot = std::make_shared<Robot>();
 
-	screen.addShape(robot);
+	std::shared_ptr<IShape> robot = std::make_shared<Robot>();	
+	//std::shared_ptr<IShape> cube = std::make_shared<Cube>();
+	std::shared_ptr<IShape> axisShape = std::make_shared<AxisShape>();
 
+	auto shapes = std::vector<std::shared_ptr<IShape>>({axisShape, robot});
+	auto shapeObject = std::make_shared<ShapeObject>(shapes);
+	shapeObject->setCentroid({0,0,0});
+	shapeObject->setPosition(320,240);
+	shapeObject->setScale(10);
+
+	//axisShape->setXRange(-100,100);
+	//axisShape->setYRange(-100,100);
+	//axisShape->setZRange(-100,100);
+	//axisObject->rotate(0.1, 0.1, 0.1);
+	screen.addShapeObject(shapeObject);
+
+	shapeObject->rotate(0.01, 0.01, 0.001);		
+	double x=0,y=0,z=0;
 	while (true) {
 		screen.show();
 		screen.clear();
 		screen.processEvent(&event);
-		screen.update();
+		screen.draw();
+		shapeObject->rotate(0.1, 0.1, 0.1);		
+
+		//shapeObject->rotate(0.0, 0.0, 0.000);		
+
+//		shapeObject->rotate(0.0, 0.01, x+=0.001);		
 		SDL_Delay(30);
 	}	
 }

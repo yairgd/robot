@@ -23,22 +23,33 @@
 
 
 #include "screen.h"
-
-//class IShape;
 #include "IShape.h"
 
 
 
 class Cube: public IShape {
 
-	private:
-		int prevX;
-		int prevY;
-		bool isDragging;
 
+	public:
+		Cube () {
+			float a = 50; //rand() % 200 ;
+			float b = 100;// a +100;
 
-		std::vector<connection> connectios{
-			{ 0, 1 },
+			points = std::vector<point> {
+				{{ a, a, a },{0,0,0}},
+				{{ b, a, a },{0,0,0}},
+				{{ b, b, a },{0,0,0}},
+				{{ a, b, a },{0,0,0}},
+
+				{{ a, a, b },{0,0,0}},
+				{{ b, a, b },{0,0,0}},
+				{{ b, b, b },{0,0,0}},
+				{{ a, b, b },{0,0,0}},
+
+			};
+
+			connectios = std::vector<connection> {
+				{ 0, 1 },
 				{ 1, 2 },
 				{ 2, 3 },
 				{ 3, 0 },
@@ -50,80 +61,25 @@ class Cube: public IShape {
 				{ 1, 5 },
 				{ 2, 6 },
 				{ 3, 7 },
-		};
-
-
-	public:
-		Cube () {
-			float a = rand() % 200 ;
-			float b = a +100;
-			
-			points = std::vector<vec3> {
-				{ a, a, a },
-				{ b, a, a },
-				{ b, b, a },
-				{ a, b, a },
-
-				{ a, a, b },
-				{ b, a, b },
-				{ b, b, b },
-				{ a, b, b }	
 			};
 
-			findCentroid();
-		 }
+		}
+
+		virtual std::vector<point>  &  getPoints() override {
+			return points;
+		}		
+
+		virtual std::vector< connection > &  getConnections() override{
+			return connectios;
+		}
+
 
 		void processEvent(SDL_Event  * event) override {
-			//while (SDL_PollEvent(event)) 
-			//{
-				switch (event->type)
-				{
-					case SDL_QUIT: 
-						SDL_Quit();
-						exit(0);
-						break;
-					case SDL_MOUSEBUTTONDOWN:
-						if (event->button.button == SDL_BUTTON_LEFT)
-						{
-							isDragging = true;
-							prevX = event->button.x;
-							prevY = event->button.y;
-							//if (x >= buttonRect.x && x <= buttonRect.x + buttonRect.w && y >= buttonRect.y && y <= buttonRect.y + buttonRect.h) {
-							printf("Button clicked! %d %d\n",prevX,prevY);
-
-						}
-						break;
-							case SDL_MOUSEBUTTONUP:
-						if (event->button.button == SDL_BUTTON_LEFT)
-						{
-							isDragging = false;
-						}
-						break;
-							case SDL_MOUSEMOTION:
-						if (isDragging)
-						{
-							int currX = event->motion.x;
-							int currY = event->motion.y;
-							int dx = currX - prevX;
-							int dy = currY - prevY;
-							// do something with dx and dy
-							prevX = currX;
-							prevY = currY;
-							printf("Mouse drag! %d %d\n",dx,dy);
-
-						}
-						break;
-						}
-				//}
+		}
 
 
-			}
 
-
-			
-
-
-			void update(IShape * shape ) override ;	
+		void update( ) override ;	
 		};
 
 
