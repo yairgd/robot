@@ -45,6 +45,7 @@ void endeffector_location(double *links,double *phi,double *xyz) {
 
 }
 
+#if 0
 /**
  * Created  05/02/2023
  * @brief   auto generated function - it calculates the jacobian
@@ -71,6 +72,7 @@ void ik_jacobian_func_analytic(double *links,double *phi, struct matrix *jacobia
 	*MAT(jacobian,2,2) = 1;
 
 }
+#endif
 
 
 
@@ -152,12 +154,15 @@ void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des
 	//set_inital_phi(phi, len);
 	double xyz_new[] ={0,0,0};
 
-	struct matrix *jacobian = matrix_init(3,3);
+	struct matrix *jacobian = matrix_init(7,3);
 	double norm;
 
-	int k=1000;
-	while (k>0) {
+	int k=10000;
+	double phi_prev[3];
+	memcpy (phi_prev, phi,24);
 		endeffector_location(links,phi,xyz_new);
+	
+	do  {
 		ik_jacobian_func_analytic(links,phi, jacobian);
 		struct matrix * diff_xyz = matrix_init(3,1);
 		diff_xyz->data[0] = des_xyz[0] - xyz_new[0];
@@ -171,8 +176,8 @@ void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des
 		norm = 0;
 		for (int i=0;i<3;i++) {
 			phi[i] = phi[i] + alpha * delta->data[i];
-			if (phi[i]>1.5707963267948966)
-				phi[i] = phi[i] - alpha * delta->data[i];
+			//if (phi[i] <0.0 || phi[i]>1.5707963267948966)
+			//	phi[i] = phi[i] - alpha * delta->data[i];
 			norm += (des_xyz[i]-xyz_new[i])*(des_xyz[i]-xyz_new[i]);
 		}
 		norm = sqrtf(norm);
@@ -194,12 +199,20 @@ void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des
 			break;
 #endif
 		//printf ("%lf %lf %lf %lf %lf %lf %lf\n", xyz_new[0], xyz_new[1], xyz_new[2], rad2deg(phi[0]), rad2deg(phi[1]), rad2deg(phi[2]), norm );
+		endeffector_location(links,phi,xyz_new);
 
 		if (norm < 0.0001)
 			break;
 		k--;
 
-	}
+
+	} while (k>0);
+	//if (norm > 0.1) {
+	//	memcpy (phi, phi_prev,24);
+	//	printf ("%f %d\n", norm,k);
+//	}
+		
+
 
 
 }

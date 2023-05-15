@@ -23,7 +23,6 @@
 
 
 void ShapeObject::draw(Screen *scr) {
-	//rotate(0.1,0.1,0.1);
 	CoordinateSystem cs(scr, x0,y0,640,480,scale);
 	//CoordinateSystem cs(scr, 150,150,300,300);
 	for ( auto s : m_shapes) {
@@ -50,7 +49,7 @@ void ShapeObject::processEvent(SDL_Event  * event)  {
 	//{
 	for ( auto s : m_shapes) {
 		s->processEvent(event);
-		
+
 	}
 
 	switch (event->type)
@@ -121,3 +120,53 @@ void ShapeObject::findCentroid() {
 	m_centroid.z /= k;
 }
 
+
+void ShapeObject::rotate(float x , float y, float z) {
+	auto do_3d_rotate = [&](vec3& point, float x , float y, float z) ->void {
+		float cx = std::cos(x);
+		float sx = std::sin(x);
+		float cy = std::cos(y);
+		float sy = std::sin(y);
+		float cz = std::cos(z);
+		float sz = std::sin(z);
+
+		// rotate around x-axis
+		float py = point.y * cx - point.z * sx;
+		float pz = point.y * sx + point.z * cx;
+
+		// rotate around y-axis
+		float px = point.x * cy + pz * sy;
+		pz = -point.x * sy + pz * cy;
+
+		// rotate around z-axis
+		float px2 = px * cz - py * sz;
+		float py2 = px * sz + py * cz;
+
+		point.x = px2;
+		point.y = py2;
+		point.z = pz;
+
+	};
+	auto do_rotate = [&](point &p) -> void {
+		p.dst = p.src;
+
+		p.dst.x -= m_centroid.x;
+		p.dst.y -= m_centroid.y;
+		p.dst.z -= m_centroid.z;
+		do_3d_rotate(p.dst,Rx,Ry,Rz);
+		p.dst.x += m_centroid.x;
+		p.dst.y += m_centroid.y;
+		p.dst.z += m_centroid.z;
+	};	
+	for ( auto   s : m_shapes) {
+		s->update();
+		auto  & points = s->getPoints();
+		for (auto &p : points) {
+			do_rotate(p);
+		}
+	}
+	Rx = x;
+	Ry = y;
+	Rz = z;
+
+}

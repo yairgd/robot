@@ -21,7 +21,6 @@
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
 #include "git.h"
-#include "lib/ta.h"
 
 
 //np in c example
@@ -152,10 +151,10 @@ void register_enum(PyObject *py_module, const char *enum_name, PyObject *py_cons
 
 }
 
-static struct PyModuleDef Algo_c =
+static struct PyModuleDef robot_c =
 {
 	PyModuleDef_HEAD_INIT,
-	"Algo_c",	 /* name of module */
+	"robot_c",	 /* name of module */
 	"",          /* module documentation, may be NULL */
 	-1,          /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
 	algo_methods
@@ -165,134 +164,36 @@ static struct PyModuleDef Algo_c =
 
 
 	PyMODINIT_FUNC
-PyInit_Algo_c(void)
+PyInit_robot_c(void)
 {
 	PyObject *m;
 
-	PyTypeObject *StrategyType = getStrategyType();
-	PyTypeObject *TickDataType = getTickDataType();
-	PyTypeObject *PerformanaceManagerType = getPerformanaceManagerType();
-	PyTypeObject *TechIndicatorType = getTechIndicatorType();
-	PyTypeObject *StrategyTesterType = getStrategyTesterType();
-	PyTypeObject *TagIndicatorType = getTagType();
-	PyTypeObject *ParameterType = getParameterType();
-	PyTypeObject *OutputType = getOutputType();
-	PyTypeObject *ModelType = getModelType();
-
-
+	m = PyModule_Create(&robot_c);
+	
+	/* register of class inside the module 
+	PyTypeObject *StrategyType = getStrategyType();	
 	if (PyType_Ready(StrategyType) < 0)
 		return NULL;
-	if (PyType_Ready(TickDataType) < 0)
-		return NULL;
-
-	if (PyType_Ready(PerformanaceManagerType) < 0)
-		return NULL;
-
-
-	if (PyType_Ready(TechIndicatorType) < 0)
-		return NULL;
-
-
-	if (PyType_Ready(TagIndicatorType) < 0)
-		return NULL;
-
-
-
-	if (PyType_Ready(StrategyTesterType) < 0)
-		return NULL;
-
-	if (PyType_Ready(ParameterType) < 0)
-		return NULL;
-
-	if (PyType_Ready(OutputType) < 0)
-		return NULL;
-
-	if (PyType_Ready(ModelType) < 0)
-		return NULL;
-
-
-
-	m = PyModule_Create(&Algo_c);
-
-	Py_INCREF(&Algo_c);
+	Py_INCREF(&robot_c);
 	if (PyModule_AddObject(m, "Strategy", (PyObject *) StrategyType) < 0) {
-		Py_DECREF(&Algo_c);
+		Py_DECREF(&robot_c);
 		Py_DECREF(m);
 		return NULL;
 	}
+	*/
 
 
-	if (PyModule_AddObject(m, "StrategyTester", (PyObject *) StrategyTesterType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
-	if (PyModule_AddObject(m, "TickData", (PyObject *) TickDataType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
+
+	
 
 
-	if (PyModule_AddObject(m, "PositionManager", (PyObject *) PerformanaceManagerType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
 
-
-	if (PyModule_AddObject(m, "TechIndicator", (PyObject *) TechIndicatorType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
-
-	if (PyModule_AddObject(m, "TagIndicator", (PyObject *) TagIndicatorType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
-
-	if (PyModule_AddObject(m, "Parameter", (PyObject *) ParameterType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
-
-
-	if (PyModule_AddObject(m, "Output", (PyObject *) OutputType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
-
-	if (PyModule_AddObject(m, "Model", (PyObject *) ModelType) < 0) {
-		Py_DECREF(&Algo_c);
-		Py_DECREF(m);
-		return NULL;
-	}
-	PyObject* py_constants_dict = PyDict_New(); // empty for the sake of example 
-	PyDict_SetItemString(py_constants_dict, "kfpt", PyLong_FromLong(TI_KFPT));
-	PyDict_SetItemString(py_constants_dict, "rsi", PyLong_FromLong(TI_RSI));
-	PyDict_SetItemString(py_constants_dict, "sma", PyLong_FromLong(TI_SMA));
-	PyDict_SetItemString(py_constants_dict, "high", PyLong_FromLong(TI_HIGH));
-	PyDict_SetItemString(py_constants_dict, "low", PyLong_FromLong(TI_LOW));
-	PyDict_SetItemString(py_constants_dict, "ema", PyLong_FromLong(TI_EMA));
-	PyDict_SetItemString(py_constants_dict, "macd", PyLong_FromLong(TI_MACD));
-	PyDict_SetItemString(py_constants_dict, "ohlc", PyLong_FromLong(TI_OHLC));
-	PyDict_SetItemString(py_constants_dict, "ema_cross", PyLong_FromLong(TI_EMA_CROSS));
-	PyDict_SetItemString(py_constants_dict, "atr", PyLong_FromLong(TI_ATR));
-	PyDict_SetItemString(py_constants_dict, "adx", PyLong_FromLong(TI_ADX));
-
-	register_enum (m , "IndicatorType", py_constants_dict);
-
-
-	py_constants_dict = PyDict_New(); // empty for the sake of example 
+	/* enum register example
+	py_constants_dict = PyDict_New(); // empty for the sake 
 	PyDict_SetItemString(py_constants_dict, "logistic_regression",  PyLong_FromLong(MODEL_LOGISTIC_REGRESSION) );
 	PyDict_SetItemString(py_constants_dict, "huristic_rsi_ema",  PyLong_FromLong(MODEL_HURISTIC_RSI_EMA) );
-
 	register_enum (m , "ModelType", py_constants_dict);
-
+	*/
 
 	// use to initilize numpyt array system
 	import_array();

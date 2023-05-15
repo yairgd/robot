@@ -4,3 +4,4 @@ flask
 flask_io
 marshmallow_enum
 pyserial
+Jinja2

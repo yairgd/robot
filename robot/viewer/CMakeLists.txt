@@ -1,62 +1,23 @@
-set ( cube_SRC 
-	./cube.cpp
+
+set (viewer_SRC 
 	./screen.cpp
-	./cube_demo.cpp
 	./ShapeObject.cpp	
-	./IShapeObjectBase.cpp
-	./AxisObject.cpp
-)
-add_executable(cube 
-	${cube_SRC}
-)
-
-
-target_include_directories(cube PRIVATE
-	./	
-)
-
-target_link_libraries(cube PRIVATE
-	SDL2	
-	robot
-	
-)
-
-
-
-
-
-set ( robot_demo_SRC 
 	./robot.cpp
-	./screen.cpp
-	./robot_demo.cpp
-	./CoordinateSystem.cpp
-	./ShapeObject.cpp
-	./IShapeObjectBase.cpp
 	./cube.cpp
-	./AxisObject.cpp
-
-
+	./CoordinateSystem.cpp
+)
+add_library(viewer STATIC
+	${viewer_SRC}
 )
 
-add_executable(robot_demo
-	${robot_demo_SRC}
+target_link_libraries(viewer PUBLIC
+	SDL2	
+	robot_static	
 )
-
-
-
-
-target_include_directories(robot_demo PUBLIC 
+target_include_directories(viewer PUBLIC
 	./	
 )
 
-
-target_link_libraries(robot_demo PUBLIC
-	-Wl,--start-group  		
-	SDL2
-	robot
-	-Wl,--end-group
-	
-)
 
 
 

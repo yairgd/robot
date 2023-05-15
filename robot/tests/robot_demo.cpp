@@ -51,14 +51,16 @@ int main(int argc, char* argv[]) {
 	//axisObject->rotate(0.1, 0.1, 0.1);
 	screen.addShapeObject(shapeObject);
 
-	shapeObject->rotate(0.01, 0.01, 0.001);		
+//	shapeObject->rotate(0.01, 0.01, 0.001);		
+	shapeObject->rotate(0.0, 0.0, 0.00);	
 	double x=0,y=0,z=0;
 	while (true) {
 		screen.show();
 		screen.clear();
 		screen.processEvent(&event);
 		screen.draw();
-		shapeObject->rotate(0.1, 0.1, 0.1);		
+		//shapeObject->rotate(0.1, 0.1, 0.1);		
+			shapeObject->rotate(0.0, 0.0, 0.00);	
 
 		//shapeObject->rotate(0.0, 0.0, 0.000);		
 
