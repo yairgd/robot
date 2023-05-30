@@ -16,11 +16,27 @@
  * =====================================================================================
  */
 
+#include "optim.h"
 
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include "matrix.h"
+#include <string.h>
+
+//#include "matrix.h"
+
+
+double parameter_get(struct parameter *p) {
+	return p->coefficient * *p->val;
+}
+
+void parameter_set_conststant(struct parameter *p, double *v, double coeff) {
+	p->coefficient = coeff;
+	p->val = v;
+}
+
+
+
 
 
 /**
@@ -160,8 +176,8 @@ void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des
 	int k=10000;
 	double phi_prev[3];
 	memcpy (phi_prev, phi,24);
-		endeffector_location(links,phi,xyz_new);
-	
+	endeffector_location(links,phi,xyz_new);
+
 	do  {
 		ik_jacobian_func_analytic(links,phi, jacobian);
 		struct matrix * diff_xyz = matrix_init(3,1);
@@ -210,8 +226,8 @@ void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des
 	//if (norm > 0.1) {
 	//	memcpy (phi, phi_prev,24);
 	//	printf ("%f %d\n", norm,k);
-//	}
-		
+	//	}
+
 
 
 
@@ -228,6 +244,23 @@ void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des
  * @param   num_of_links the length of the links vector
  * @param   xyz gets  the final resuls in form of 2d shape -> dim[m][3] , m is the number of links, each row is xyz of the m'th links
  * @return  
+ *for k in  range(0,len(ll)):
+ H=np.identity(4);
+ print("calc H")
+ for i in range(0,k+1):
+ print(i)
+ m = roate_z(phi[i],ll[i]);
+ H=H@m; 
+ xy = [0,0,0]
+ xy.append(1)
+ x.append((H@xy)[0,0])
+ y.append((H@xy)[0,1])
+ fig,ax = plt.subplots()
+ ax.plot(x, y, marker='*',linewidth=2.0)
+ plt.show()
+
+ *
+ *
  */
 void forward_kinematic(double *links,double *alpha, double *beta , double *gamma, struct vec3 *xyz, int num_of_links) {
 	int i,k;
@@ -237,7 +270,7 @@ void forward_kinematic(double *links,double *alpha, double *beta , double *gamma
 	for (i = 0; i < num_of_links; i++) {
 		struct matrix  * t = matrix_translation_z(gamma[i],  links[i]);
 		struct matrix  * m  = matrix_mul(G, t);
-		struct matrix  * ef = matrix_mul(m,O);
+		//		struct matrix  * ef = matrix_mul(m,O);
 
 		matrix_free(G);
 		G = matrix_copy(m);
@@ -248,32 +281,227 @@ void forward_kinematic(double *links,double *alpha, double *beta , double *gamma
 		xyz[i].x = *MAT(mo,0,0);
 		xyz[i].y = *MAT(mo,1,0);
 		xyz[i].z = *MAT(mo,2,0);
-	
+
 		matrix_free(t);
 		matrix_free(m);
-		matrix_free(ef);
+		//		matrix_free(ef);
 		matrix_free(mo);
 
 	}
 	matrix_free(O);
 	matrix_free(G);
-	
-
-	//	}
 }
-#if 0
-     for k in  range(0,len(ll)):
-	H=np.identity(4);
-	print("calc H")
-	for i in range(0,k+1):
-		print(i)
-		m = roate_z(phi[i],ll[i]);
-		H=H@m; 
-	xy = [0,0,0]
-	xy.append(1)
-	x.append((H@xy)[0,0])
-	y.append((H@xy)[0,1])
-fig,ax = plt.subplots()
-	ax.plot(x, y, marker='*',linewidth=2.0)
-plt.show()
-#endif
+
+
+void rotate(struct vec3 * point,struct vec3 *ang) {
+	float cx = cos(ang->x);
+	float sx = sin(ang->x);
+	float cy = cos(ang->y);
+	float sy = sin(ang->y);
+	float cz = cos(ang->z);
+	float sz = sin(ang->z);
+
+	// rotate around x-axis
+	float py = point->y * cx - point->z * sx;
+	float pz = point->y * sx + point->z * cx;
+
+	// rotate around y-axis
+	float px = point->x * cy + pz * sy;
+	pz = -point->x * sy + pz * cy;
+
+	// rotate around z-axis
+	float px2 = px * cz - py * sz;
+	float py2 = px * sz + py * cz;
+
+	point->x = px2;
+	point->y = py2;
+	point->z = pz;
+}
+
+
+
+void joint_add_child(struct joint *parent , const char *name, struct joint *child) {
+	parent->child.link.name = name;
+	parent->child.link.child = child; 
+	parent->child.link.parent = parent; 
+
+}
+
+void joint_set_parent_link(struct joint *j, struct link *l)  {
+	j->parent = l;
+};
+
+struct link * joint_get_child_link(struct joint *j, int child_idx) {
+	return &j->child.link;
+}
+
+struct joint * init_robot() {
+	static double g1, p1,p2,p3;
+
+
+	struct joint *  j1 = ( struct joint *) malloc (sizeof(struct joint));
+	*j1 = (struct joint) {
+		.name = (char*)"joint1",
+			.type = JOINT_FIXED,
+			.rpy = {PI,0,PI/2}, 		
+			.origin = {0,0,0},
+			.child = {
+				.link = {0},
+				.next = 0,
+			},
+			.parent = 0,
+			.limit = {0},
+			.axis = { {0,0},{0,0}, {1,&g1}}
+
+	};
+	joint_set_parent_link(j1, 0 ) ;
+
+
+
+
+	struct joint *  j2 = ( struct joint *) malloc (sizeof(struct joint));
+	*j2 = (struct joint) {
+		.name = (char*)"joint2",
+			.type = JOINT_FIXED,
+			.rpy = {0,0,0}, 		
+			.origin = {4,0,0},
+			.child = {
+				.link = {0},
+				.next = 0,
+			},
+			.parent = 0,
+			.limit = {0},
+			.axis = { {1,&p1},{0,0},{0,0}}
+
+	};
+	joint_set_parent_link(j2, joint_get_child_link(j1,0) ) ;
+
+
+	struct joint *  j3 = ( struct joint *) malloc (sizeof(struct joint));
+	*j3 = (struct joint) {
+		.name = (char*)"joint3",
+			.type = JOINT_FIXED,
+			.rpy = {0,0,0}, 		
+			.origin = {4,0,0},
+			.child = {
+				.link = {0},
+				.next = 0,
+			},
+			.parent = 0,
+			.limit = {0},
+			.axis = { {1,&p2},{0,0},{0,0}}
+
+	};
+	joint_set_parent_link(j3, joint_get_child_link(j2,0) ) ;
+
+
+
+
+	struct joint *  j4 = ( struct joint *) malloc (sizeof(struct joint));
+	*j4 = (struct joint) {
+		.name = (char*)"joint4",
+		.type = JOINT_FIXED,
+		.rpy = {0,0,0}, 		
+		.origin = {6,0,0},
+		.child = {
+			.link = {0},
+			.next = 0,
+		},
+		.parent = 0,
+		.limit = {0},
+		.axis = { {1,&p3},{0,0},{0,0}}
+
+	};
+	joint_set_parent_link(j4, joint_get_child_link(j3,0) ) ;
+
+	joint_add_child (j1, "l1",j2);
+	joint_add_child (j2, "l2",j3);
+	joint_add_child (j3, "l3",j4);
+	joint_add_child (j4, "l4",0);
+
+	return j4;	
+}
+
+
+
+/**
+ * Created  05/30/2023
+ * @brief   create translation matrix
+ * @param   j is the joint with the data of the matrix
+ * @param   rot_angle the rotatuion angle
+ * @param   vec3 is the location of the axis after translation. it is positioned in relate to the parent axis (joint)
+ * @return  
+ here is the python code to get the formula of the matrix
+import  sympy as sym
+#import  pysym as ee
+cx= sym.Symbol('cx');
+sx= sym.Symbol('sx');
+cy= sym.Symbol('cy');
+sy= sym.Symbol('sy');
+cz= sym.Symbol('cz');
+sz= sym.Symbol('sz');
+Rx=sym.Matrix([[1,0,0],[0,cx,sx],[0,-sx,cx]]);
+Ry=sym.Matrix([[cy,0,-sy],[0,1,0],[sy,0,cy]]);
+Rz=sym.Matrix([[cz,sz,0],[-sz,cz,0],[0,0,1]]);
+R=Rx*Ry*Rz
+R.simplify()
+*/
+
+void joint_translation_matrix(struct joint *j,  struct vec3 *rot_angle,  struct vec3 *vec) {
+	float cx = cos(rot_angle->x);
+	float cy = cos(rot_angle->y);
+	float cz = cos(rot_angle->z);
+	float sx = sin(rot_angle->x);
+	float sy = sin(rot_angle->y);
+	float sz = sin(rot_angle->z);
+
+	struct vec3 rot_vec = *vec;
+
+	rotate (&rot_vec, rot_angle);
+	// initlize matirx if needed
+	if (j->translation_matrix == 0)
+		j->translation_matrix = matrix_init(4,4);
+
+	// assign values to matrix
+	*MAT(j->translation_matrix,0,0) =  cy*cz;
+	*MAT(j->translation_matrix,0,1) =  cy*sz;
+	*MAT(j->translation_matrix,0,2) =  -sy;
+	*MAT(j->translation_matrix,0,3) =  rot_vec.x;
+
+	*MAT(j->translation_matrix,1,0) =  -cx*sz + cz*sx*sy;
+	*MAT(j->translation_matrix,1,1) =  cx*cz + sx*sy*sz;
+	*MAT(j->translation_matrix,1,2) =  cy*sx;
+	*MAT(j->translation_matrix,1,3) =  rot_vec.y;
+
+	*MAT(j->translation_matrix,2,0) = cx*cz*sy + sx*sz;
+	*MAT(j->translation_matrix,2,1) = cx*sy*sz - cz*sx;
+	*MAT(j->translation_matrix,2,2) = cx*cy;
+	*MAT(j->translation_matrix,2,3) = rot_vec.z;
+
+	*MAT(j->translation_matrix,3,0) = 0;
+	*MAT(j->translation_matrix,3,1) = 0;
+	*MAT(j->translation_matrix,3,2) = 0;
+	*MAT(j->translation_matrix,3,3) = 1;
+}
+
+void scan_joints_alog_chanin(struct joint *current, struct link *first_joint_in_chain) {
+	if (current->parent != 0 && current->parent != first_joint_in_chain)
+		scan_joints_alog_chanin (current->parent->parent, first_joint_in_chain);
+
+	printf ("%s\n",joint_get_child_link(current,0)->name); 
+	printf ("%s\n",current->name); 
+
+}
+
+
+void forward_calc() {
+	struct joint * j4 =  init_robot();
+	scan_joints_alog_chanin (j4, 0);
+
+
+	
+}
+
+
+
+

@@ -26,11 +26,17 @@
 #include "ShapeObject.h"
 
 #include "screen.h"
+#include "optim.h"
 
 
-
-
+extern "C" {
+void forward_calc() ;
+}
 int main(int argc, char* argv[]) {
+
+
+	
+	forward_calc();
 	Screen screen(640*2,480*2);
 	SDL_Event event;
 	
@@ -59,8 +65,8 @@ int main(int argc, char* argv[]) {
 		screen.clear();
 		screen.processEvent(&event);
 		screen.draw();
-		//shapeObject->rotate(0.1, 0.1, 0.1);		
-			shapeObject->rotate(0.0, 0.0, 0.00);	
+		shapeObject->rotate(0.1, 0.1, 0.1);		
+		//	shapeObject->rotate(0.0, 0.0, 0.00);	
 
 		//shapeObject->rotate(0.0, 0.0, 0.000);		
 
