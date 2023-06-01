@@ -26,11 +26,13 @@
 //#include "matrix.h"
 
 
-double parameter_get(struct parameter *p) {
-	return p->coefficient * *p->val;
+float parameter_get(struct parameter  *p) {
+	if (p->val != 0)
+		return *p->val * p->coefficient;
+	return 0;
 }
 
-void parameter_set_conststant(struct parameter *p, double *v, double coeff) {
+void parameter_set_conststant(struct parameter *p, float *v, float coeff) {
 	p->coefficient = coeff;
 	p->val = v;
 }
@@ -293,13 +295,13 @@ void forward_kinematic(double *links,double *alpha, double *beta , double *gamma
 }
 
 
-void rotate(struct vec3 * point,struct vec3 *ang) {
-	float cx = cos(ang->x);
-	float sx = sin(ang->x);
-	float cy = cos(ang->y);
-	float sy = sin(ang->y);
-	float cz = cos(ang->z);
-	float sz = sin(ang->z);
+void rotate(struct vec3 * point,float Rx, float Ry, float Rz) {
+	float cx = cos(Rx);
+	float sx = sin(Rx);
+	float cy = cos(Ry);
+	float sy = sin(Ry);
+	float cz = cos(Rz);
+	float sz = sin(Rz);
 
 	// rotate around x-axis
 	float py = point->y * cx - point->z * sx;
@@ -336,14 +338,17 @@ struct link * joint_get_child_link(struct joint *j, int child_idx) {
 }
 
 struct joint * init_robot() {
-	static double g1, p1,p2,p3;
+	static float g1, p1,p2,p3;
 
-
+	p1 = 0.000000;
+	p2 = 0.401455;
+	p3 = 0.666982;
+	g1 = 0.0;
 	struct joint *  j1 = ( struct joint *) malloc (sizeof(struct joint));
 	*j1 = (struct joint) {
 		.name = (char*)"joint1",
 			.type = JOINT_FIXED,
-			.rpy = {PI,0,PI/2}, 		
+			.rpy = {0,0,0} , /*{PI,0,PI/2}, 		*/
 			.origin = {0,0,0},
 			.child = {
 				.link = {0},
@@ -351,7 +356,7 @@ struct joint * init_robot() {
 			},
 			.parent = 0,
 			.limit = {0},
-			.axis = { {0,0},{0,0}, {1,&g1}}
+			.axis = { {0,0},{1,&g1}, {0,0}}
 
 	};
 	joint_set_parent_link(j1, 0 ) ;
@@ -371,25 +376,25 @@ struct joint * init_robot() {
 			},
 			.parent = 0,
 			.limit = {0},
-			.axis = { {1,&p1},{0,0},{0,0}}
+			.axis = { {0,0},{0,0},{1,&p1}}
 
 	};
 	joint_set_parent_link(j2, joint_get_child_link(j1,0) ) ;
 
 
-	struct joint *  j3 = ( struct joint *) malloc (sizeof(struct joint));
+	struct joint *  j3 = ( struct joint *) malloc (sizeof(struct joint));	
 	*j3 = (struct joint) {
 		.name = (char*)"joint3",
 			.type = JOINT_FIXED,
 			.rpy = {0,0,0}, 		
-			.origin = {4,0,0},
+			.origin = {6,0,0},
 			.child = {
 				.link = {0},
 				.next = 0,
 			},
 			.parent = 0,
 			.limit = {0},
-			.axis = { {1,&p2},{0,0},{0,0}}
+			.axis = { {0,0},{0,0},{1,&p2}}
 
 	};
 	joint_set_parent_link(j3, joint_get_child_link(j2,0) ) ;
@@ -409,7 +414,7 @@ struct joint * init_robot() {
 		},
 		.parent = 0,
 		.limit = {0},
-		.axis = { {1,&p3},{0,0},{0,0}}
+		.axis = { {0,0},{0,0},{1,&p3}}
 
 	};
 	joint_set_parent_link(j4, joint_get_child_link(j3,0) ) ;
@@ -421,6 +426,8 @@ struct joint * init_robot() {
 
 	return j4;	
 }
+
+
 
 
 
@@ -444,38 +451,67 @@ Rx=sym.Matrix([[1,0,0],[0,cx,sx],[0,-sx,cx]]);
 Ry=sym.Matrix([[cy,0,-sy],[0,1,0],[sy,0,cy]]);
 Rz=sym.Matrix([[cz,sz,0],[-sz,cz,0],[0,0,1]]);
 R=Rx*Ry*Rz
+cx0= sym.Symbol('cx0');
+sx0= sym.Symbol('sx0');
+cy0= sym.Symbol('cy0');
+sy0= sym.Symbol('sy0');
+cz0= sym.Symbol('cz0');
+sz0= sym.Symbol('sz0');
+Rx0=sym.Matrix([[1,0,0],[0,cx0,sx0],[0,-sx,cx0]]);
+Ry0=sym.Matrix([[cy0,0,-sy0],[0,1,0],[sy0,0,cy0]]);
+Rz0=sym.Matrix([[cz0,sz0,0],[-sz0,cz0,0],[0,0,1]]);
+R=Rx*Ry*Rz*Rx0*Ry0*Rz0
 R.simplify()
+R[0,0]
+R[0,1]
+R[0,2]
+R[1,0]
+R[1,1]
+R[1,2]
+R[2,0]
+R[2,1]
+R[2,2]
+
 */
 
-void joint_translation_matrix(struct joint *j,  struct vec3 *rot_angle,  struct vec3 *vec) {
-	float cx = cos(rot_angle->x);
-	float cy = cos(rot_angle->y);
-	float cz = cos(rot_angle->z);
-	float sx = sin(rot_angle->x);
-	float sy = sin(rot_angle->y);
-	float sz = sin(rot_angle->z);
+void joint_translation_matrix(struct joint *j) {
+	float cx = cos(parameter_get(&j->axis.x));
+	float cy = cos(parameter_get(&j->axis.y));
+	float cz = cos(parameter_get(&j->axis.z));
+	float sx = sin(parameter_get(&j->axis.x));
+	float sy = sin(parameter_get(&j->axis.y));
+	float sz = sin(parameter_get(&j->axis.z));
+	float cx0 = cos(j->rpy.x);
+	float cy0 = cos(j->rpy.y);
+	float cz0 = cos(j->rpy.z);
+	float sx0 = sin(j->rpy.x);
+	float sy0 = sin(j->rpy.y);
+	float sz0 = sin(j->rpy.z);
 
-	struct vec3 rot_vec = *vec;
 
-	rotate (&rot_vec, rot_angle);
+	// rotate the current location of the axis after rotation of the parent
+	struct vec3 rot_vec =  j->origin;
+	rotate (&rot_vec, parameter_get(&j->axis.x),parameter_get(&j->axis.y), parameter_get(&j->axis.z)  );
+	rotate (&rot_vec, j->rpy.x,  j->rpy.y,  j->rpy.z);
+
 	// initlize matirx if needed
 	if (j->translation_matrix == 0)
 		j->translation_matrix = matrix_init(4,4);
 
 	// assign values to matrix
-	*MAT(j->translation_matrix,0,0) =  cy*cz;
-	*MAT(j->translation_matrix,0,1) =  cy*sz;
-	*MAT(j->translation_matrix,0,2) =  -sy;
-	*MAT(j->translation_matrix,0,3) =  rot_vec.x;
+	*MAT(j->translation_matrix,0,0) = cz0*(cy*cy0*cz - sy0*(cx0*sy - cy*sx0*sz)) - sz0*(cx0*cy*sz + sx*sy);
+	*MAT(j->translation_matrix,1,0) = cz0*(cx0*cy*sz + sx*sy) + sz0*(cy*cy0*cz - sy0*(cx0*sy - cy*sx0*sz));   /// TODO rever with (1,0) <->(0,1)
+	*MAT(j->translation_matrix,0,2) = -cy*cz*sy0 - cy0*(cx0*sy - cy*sx0*sz);
+	*MAT(j->translation_matrix,0,3) = rot_vec.x;
 
-	*MAT(j->translation_matrix,1,0) =  -cx*sz + cz*sx*sy;
-	*MAT(j->translation_matrix,1,1) =  cx*cz + sx*sy*sz;
-	*MAT(j->translation_matrix,1,2) =  cy*sx;
-	*MAT(j->translation_matrix,1,3) =  rot_vec.y;
+	*MAT(j->translation_matrix,0,1) = -cz0*(cy0*(cx*sz - cz*sx*sy) - sy0*(cx0*cy*sx + sx0*(cx*cz + sx*sy*sz))) - sz0*(cx0*(cx*cz + sx*sy*sz) - cy*sx*cy*sx); /// TODO rever with (1,0) <->(0,1)
+	*MAT(j->translation_matrix,1,1) = cz0*(cx0*(cx*cz + sx*sy*sz) - cy*sx*cy*sx) - sz0*(cy0*(cx*sz - cz*sx*sy) - sy0*(cx0*cy*sx + sx0*(cx*cz + sx*sy*sz)));
+	*MAT(j->translation_matrix,1,2) = cy0*(cx0*cy*sx + sx0*(cx*cz + sx*sy*sz)) + sy0*(cx*sz - cz*sx*sy);
+	*MAT(j->translation_matrix,1,3) = rot_vec.y;
 
-	*MAT(j->translation_matrix,2,0) = cx*cz*sy + sx*sz;
-	*MAT(j->translation_matrix,2,1) = cx*sy*sz - cz*sx;
-	*MAT(j->translation_matrix,2,2) = cx*cy;
+	*MAT(j->translation_matrix,2,0) = cz0*(cy0*(cx*cz*sy + sx*sz) + sy0*(cx*cx0*cy + sx0*(cx*sy*sz - cz*sx))) + sz0*(cx*cy*sx - cx0*(cx*sy*sz - cz*sx));
+	*MAT(j->translation_matrix,2,1) = -cz0*(cx*cy*sx - cx0*(cx*sy*sz - cz*sx)) + sz0*(cy0*(cx*cz*sy + sx*sz) + sy0*(cx*cx0*cy + sx0*(cx*sy*sz - cz*sx)));
+	*MAT(j->translation_matrix,2,2) = cy0*(cx*cx0*cy + sx0*(cx*sy*sz - cz*sx)) - sy0*(cx*cz*sy + sx*sz);
 	*MAT(j->translation_matrix,2,3) = rot_vec.z;
 
 	*MAT(j->translation_matrix,3,0) = 0;
@@ -484,19 +520,68 @@ void joint_translation_matrix(struct joint *j,  struct vec3 *rot_angle,  struct 
 	*MAT(j->translation_matrix,3,3) = 1;
 }
 
-void scan_joints_alog_chanin(struct joint *current, struct link *first_joint_in_chain) {
-	if (current->parent != 0 && current->parent != first_joint_in_chain)
-		scan_joints_alog_chanin (current->parent->parent, first_joint_in_chain);
 
+/**
+ * Created  06/01/2023
+ * @brief   calculate forward kinetic for joint chain
+ * this is revursive call from the last joint in the chain to ward the first link of a chain.  The recursive
+ * starts to calclates the transation matrix right after the recursive get into stop condtion.
+ * @param   current - the last joint in the chain
+ * @param   first_joint_in_chain the first link in the chain
+ * @return  linked list of each joint position
+ */
+ struct vec3_list * forward_kinetic_for_chain(struct joint *current, struct link *first_joint_in_chain) {
+	struct vec3_list *list_prev = 0, *list;
+
+	// recursive call to parenet joint - stop when getting to fist_joint_in_chain
+	if (current->parent != 0 && current->parent != first_joint_in_chain)
+		list_prev = forward_kinetic_for_chain (current->parent->parent, first_joint_in_chain);
+
+	// find traslation matrix for the current joint
+	joint_translation_matrix(current);
+
+	// multiply the current traslation matrix and the translation from previous joint
+	if (current->parent) {
+		struct matrix * matrix_m = matrix_mul(current->parent->parent->translation_matrix, current->translation_matrix); 
+		matrix_free(current->translation_matrix);
+		current->translation_matrix = matrix_m;
+	}
+
+
+	// collect the location of the current join into a linkaged list
+	list = (struct vec3_list*)malloc(sizeof (struct vec3_list));	
+	list->prev = list_prev;	
+	list->p.x = *MAT(current->translation_matrix,0,3);
+	list->p.y = *MAT(current->translation_matrix,1,3);
+	list->p.z = *MAT(current->translation_matrix,2,3);
+	/*
+	if we want forwad connection - not needed
+	if (list_prev)
+		list_prev->next = list;
+	*/
+
+	/* uncomment to dump
+	matrix_dump (current->translation_matrix);	
 	printf ("%s\n",joint_get_child_link(current,0)->name); 
 	printf ("%s\n",current->name); 
+	*/
+	return list;
 
 }
 
 
 void forward_calc() {
+	struct vec3_list *list,*prev;
+
 	struct joint * j4 =  init_robot();
-	scan_joints_alog_chanin (j4, 0);
+
+	list = forward_kinetic_for_chain (j4, 0);
+	while (list) {
+		printf ("xyz: %lf, %lf,  %lf\n", list->p.x, list->p.y , list->p.z);
+		prev=list->prev;
+		free(list);
+		list = prev;
+	}
 
 
 	

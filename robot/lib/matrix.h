@@ -22,6 +22,13 @@ struct vec3
 {
 	double  x,y,z;
 };
+
+struct vec3_list {
+	struct vec3 p;
+	//struct vec3_list *next;
+	struct vec3_list *prev;
+
+};
 struct matrix {
 	double *data;
 	int m,n;

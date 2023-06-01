@@ -27,11 +27,12 @@ extern "C" {
 
 
 struct parameter {
-	double coefficient;
-	double *val;
+	float coefficient;
+	float *val;
 };
 
-
+float parameter_get(struct parameter  *p);
+void parameter_set_conststant(struct parameter *p, float *v, float coeff);
 
 enum joint_type {
 	JOINT_REVOLUTE, JOINT_FIXED, prismatic
@@ -111,12 +112,13 @@ struct link * joint_get_child_link(struct joint *j, int child_idx) ;
 void joint_add_child(struct joint *j , const char *name, struct joint *child);
 
 
-
 //void joint 
 
 void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des_xyz,int len,double alpha);
 void calc_grdient_decent(double *phi,double *links, double *des_xyz,double alpha) ;
 void forward_kinematic(double *links,double *alpha, double *beta , double *gamma, struct vec3 *xyz, int num_of_links);
+
+ struct vec3_list * forward_kinetic_for_chain(struct joint *current, struct link *first_joint_in_chain);
 //void forward_calc(struct joint *j1, struct joint *j2) ;
 struct joint * init_robot() ;
 #ifdef __cplusplus
