@@ -25,8 +25,7 @@ struct vec3
 
 struct vec3_list {
 	struct vec3 p;
-	//struct vec3_list *next;
-	struct vec3_list *prev;
+	struct vec3_list *next;
 
 };
 struct matrix {

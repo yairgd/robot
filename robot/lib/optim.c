@@ -337,13 +337,34 @@ struct link * joint_get_child_link(struct joint *j, int child_idx) {
 	return &j->child.link;
 }
 
-struct joint * init_robot() {
-	static float g1, p1,p2,p3;
 
-	p1 = 0.000000;
-	p2 = 0.401455;
-	p3 = 0.666982;
-	g1 = 0.0;
+struct model  * model_new(int n) {
+	struct model *model = (struct model*)malloc(sizeof(struct model));
+	model->num_of_variable = n;
+	model->variables =(float*) malloc(sizeof(float)*n);
+	return model;
+}
+
+void model_free(struct model *model) {
+	if (model) {
+		free(model->variables);
+		free(model);
+	}
+}
+
+struct model * init_robot() {
+
+
+	struct model *model = model_new(4);
+	float * p1 = &model->variables[0];
+	float * p2 = &model->variables[1];
+	float * p3 = &model->variables[2];
+	float * g1 = &model->variables[3];
+
+	*p1 = 0.100000;
+	*p2 = 0.401455;
+	*p3 = 0.666982;
+	*g1 = 0.0;
 	struct joint *  j1 = ( struct joint *) malloc (sizeof(struct joint));
 	*j1 = (struct joint) {
 		.name = (char*)"joint1",
@@ -356,7 +377,7 @@ struct joint * init_robot() {
 			},
 			.parent = 0,
 			.limit = {0},
-			.axis = { {0,0},{1,&g1}, {0,0}}
+			.axis = { {0,0},{1,g1}, {0,0}}
 
 	};
 	joint_set_parent_link(j1, 0 ) ;
@@ -376,7 +397,7 @@ struct joint * init_robot() {
 			},
 			.parent = 0,
 			.limit = {0},
-			.axis = { {0,0},{0,0},{1,&p1}}
+			.axis = { {0,0},{0,0},{1,p1}}
 
 	};
 	joint_set_parent_link(j2, joint_get_child_link(j1,0) ) ;
@@ -394,7 +415,7 @@ struct joint * init_robot() {
 			},
 			.parent = 0,
 			.limit = {0},
-			.axis = { {0,0},{0,0},{1,&p2}}
+			.axis = { {0,0},{0,0},{1,p2}}
 
 	};
 	joint_set_parent_link(j3, joint_get_child_link(j2,0) ) ;
@@ -414,7 +435,7 @@ struct joint * init_robot() {
 		},
 		.parent = 0,
 		.limit = {0},
-		.axis = { {0,0},{0,0},{1,&p3}}
+		.axis = { {0,0},{0,0},{1,p3}}
 
 	};
 	joint_set_parent_link(j4, joint_get_child_link(j3,0) ) ;
@@ -424,7 +445,9 @@ struct joint * init_robot() {
 	joint_add_child (j3, "l3",j4);
 	joint_add_child (j4, "l4",0);
 
-	return j4;	
+	model->endeffector = j4;
+	model->base_link = 0;
+	return model;
 }
 
 
@@ -531,16 +554,16 @@ void joint_translation_matrix(struct joint *j) {
  * @return  linked list of each joint position
  */
  struct vec3_list * forward_kinetic_for_chain(struct joint *current, struct link *first_joint_in_chain) {
-	struct vec3_list *list_prev = 0, *list;
+	struct vec3_list *list_next = 0, *list;
 
 	// recursive call to parenet joint - stop when getting to fist_joint_in_chain
 	if (current->parent != 0 && current->parent != first_joint_in_chain)
-		list_prev = forward_kinetic_for_chain (current->parent->parent, first_joint_in_chain);
+		list_next = forward_kinetic_for_chain (current->parent->parent, first_joint_in_chain);
 
 	// find traslation matrix for the current joint
 	joint_translation_matrix(current);
 
-	// multiply the current traslation matrix and the translation from previous joint
+	// multiply the current traslation matrix and the translation from nextious joint
 	if (current->parent) {
 		struct matrix * matrix_m = matrix_mul(current->parent->parent->translation_matrix, current->translation_matrix); 
 		matrix_free(current->translation_matrix);
@@ -550,14 +573,14 @@ void joint_translation_matrix(struct joint *j) {
 
 	// collect the location of the current join into a linkaged list
 	list = (struct vec3_list*)malloc(sizeof (struct vec3_list));	
-	list->prev = list_prev;	
+	list->next = list_next;	
 	list->p.x = *MAT(current->translation_matrix,0,3);
 	list->p.y = *MAT(current->translation_matrix,1,3);
 	list->p.z = *MAT(current->translation_matrix,2,3);
 	/*
 	if we want forwad connection - not needed
-	if (list_prev)
-		list_prev->next = list;
+	if (list_next)
+		list_next->next = list;
 	*/
 
 	/* uncomment to dump
@@ -570,17 +593,111 @@ void joint_translation_matrix(struct joint *j) {
 }
 
 
+
+void vec3_list_free(struct vec3_list *list) {
+	struct vec3_list *next;
+	while (list) {
+		next=list->next;
+		free(list);
+		list = next;
+	}
+}
+
+void endeffector_cost_function_numeric_gradient(struct model *model, double *des_xyz,double *grad) {
+	float h=0.0001;
+	struct vec3_list *list;
+	float dx, dy, dz;
+
+	for (int  i = 0; i < model->num_of_variable;i++) {
+		list = forward_kinetic_for_chain (model->endeffector, model->base_link);
+		dx = (list->p.x - des_xyz[0]);
+		dy = (list->p.y - des_xyz[1]);
+		dz = (list->p.z - des_xyz[2]);
+		float f = dx*dx + dy*dy + dz*dz;
+		vec3_list_free(list);
+
+
+		model->variables[i] += h;
+		list = forward_kinetic_for_chain (model->endeffector, model->base_link);
+		dx = (list->p.x - des_xyz[0]);
+		dy = (list->p.y - des_xyz[1]);
+		dz = (list->p.z - des_xyz[2]);
+		float fh = dx*dx + dy*dy + dz*dz;
+		vec3_list_free(list);
+		model->variables[i] -= h;
+
+		grad[i] = (fh-f)/h;
+
+	}
+
+
+
+
+
+
+
+}
+/**
+ * Created  06/01/2023
+ * @brief   minimize the endeffector location using minimzation of mean squre of the disstance between the current endeffector location and the target
+ * @param   
+ * @return  
+ */
+void endeffector_grdient_decent(struct model *model, double *des_xyz,double alpha) {
+	double grad[4]; // will be taken from autogenerated frnction
+	double norm;
+	double xyz_new[3] = {0,0,0};
+	int k = 100000;
+	struct vec3_list *list;
+
+	float * phi = model->variables;
+	while (k>0) {
+	
+		endeffector_cost_function_numeric_gradient(model, des_xyz, grad);
+		//ik_cost_gradient_func_analytic(phi,links, des_xyz,grad);
+		for (int i=0;i<model->num_of_variable;i++) {
+			phi[i] = phi[i] - grad[i]*alpha;
+			if (phi[i] <0.0 || phi[i]>1.5707963267948966)
+				phi[i] = phi[i] + grad[i]*alpha;
+		}
+		
+		// calc norm
+		norm = 0;		
+		for (int j=0;j < 3;j++) {
+			norm += (des_xyz[j]-xyz_new[j])*(des_xyz[j]-xyz_new[j]);
+		}
+
+		//norm = sqrtf(norm);
+		double err = 0.001;
+		if (norm < err*err)
+			break;
+		list = forward_kinetic_for_chain (model->endeffector, model->base_link);
+		xyz_new[0] =  list->p.x;
+		xyz_new[1] =  list->p.y;
+		xyz_new[2] =  list->p.z;
+
+		vec3_list_free(list);
+		k--;
+
+		printf ("%d %lf %lf %lf %lf %lf %lf %lf %lf\n", 100000- k,norm,xyz_new[0], xyz_new[1], xyz_new[2], rad2deg(phi[0]), rad2deg(phi[1]), rad2deg(phi[2]), (xyz_new[0]-des_xyz[0]) * (xyz_new[0]-des_xyz[0])  + (xyz_new[1]-des_xyz[1]) * (xyz_new[1]-des_xyz[1]) );		
+	}
+}
+
+
+
 void forward_calc() {
-	struct vec3_list *list,*prev;
+	struct vec3_list *list,*next;
+	double des_xyz [3]= {9.411929, 7.603243, 1.539922};
+	struct model * model =  init_robot();
 
-	struct joint * j4 =  init_robot();
-
-	list = forward_kinetic_for_chain (j4, 0);
+	endeffector_grdient_decent (model, des_xyz, 0.001);
+	
+	list = forward_kinetic_for_chain (model->endeffector, model->base_link);
 	while (list) {
 		printf ("xyz: %lf, %lf,  %lf\n", list->p.x, list->p.y , list->p.z);
-		prev=list->prev;
+		next=list->next;
 		free(list);
-		list = prev;
+		list = next;
 	}
 
 

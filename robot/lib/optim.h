@@ -34,24 +34,21 @@ struct parameter {
 float parameter_get(struct parameter  *p);
 void parameter_set_conststant(struct parameter *p, float *v, float coeff);
 
+
+
 enum joint_type {
 	JOINT_REVOLUTE, JOINT_FIXED, prismatic
 };
 
+struct model {
+	struct link *base_link;
+	struct joint *endeffector;
+	int num_of_variable;
+	float *variables;
+};
+struct model  * model_new(int n);
+void model_free(struct model *);
 
-struct dh_matrix {
-		// rotation angle around X
-		double alpha; 
-
-		// rotation angle around Z
-		double phi;
-
-		// displacment over Z
-		double d;
-
-		// dispalacement over X
-		double r;
-	} ;	
 
 
 
@@ -120,7 +117,7 @@ void forward_kinematic(double *links,double *alpha, double *beta , double *gamma
 
  struct vec3_list * forward_kinetic_for_chain(struct joint *current, struct link *first_joint_in_chain);
 //void forward_calc(struct joint *j1, struct joint *j2) ;
-struct joint * init_robot() ;
+struct model * init_robot() ;
 #ifdef __cplusplus
 }
 #endif
