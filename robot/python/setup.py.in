@@ -15,14 +15,14 @@ if os.name == 'nt':
 else:
     name  = "LinuxRobot"
     compile_args=['-g','-O0']
-    libs=['robot_static']  # converted to -lalgo_static
+    libs=['robot_static', 'lapack']  # 
     macro=[]
 
 robot_c = Extension("robot_c", 
-                                 include_dirs=['${CMAKE_SOURCE_DIR}/' ,  '${CMAKE_SOURCE_DIR}/../',  '${CMAKE_SOURCE_DIR}/'  ,'${CMAKE_BINARY_DIR}/','${CMAKE_SOURCE_DIR}/algo'  ,'/usr/lib/python3.10/site-packages/numpy/core/include/'   ],
+                                 include_dirs=['${CMAKE_SOURCE_DIR}/' ,  '${CMAKE_SOURCE_DIR}/../',  '${CMAKE_SOURCE_DIR}/'  ,'${CMAKE_BINARY_DIR}/','${CMAKE_SOURCE_DIR}/robot/lib'  ,'/usr/lib/python3.10/site-packages/numpy/core/include/'   ],
                                  extra_compile_args=compile_args,   
                                  sources= ["${CMAKE_SOURCE_DIR}/robot/python/src/robot.c",
-                                           
+                                          "${CMAKE_SOURCE_DIR}/robot/python/src/model.c" 
                                      ],
                                  depends=["${CMAKE_BINARY_DIR}/git.h"],                                 
                                  libraries=libs,

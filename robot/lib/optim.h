@@ -104,6 +104,14 @@ struct joint {
 	struct matrix *translation_matrix;
 };
 
+
+struct vec3_list {
+	struct vec3 p;
+	struct joint *joint;
+	struct vec3_list *next;
+};
+
+
 void joint_set_parent_link(struct joint *j, struct link *l) ;
 struct link * joint_get_child_link(struct joint *j, int child_idx) ;
 void joint_add_child(struct joint *j , const char *name, struct joint *child);
@@ -114,8 +122,9 @@ void joint_add_child(struct joint *j , const char *name, struct joint *child);
 void  jacobian_pseudoinverse_optimization(double *phi,double *links, double *des_xyz,int len,double alpha);
 void calc_grdient_decent(double *phi,double *links, double *des_xyz,double alpha) ;
 void forward_kinematic(double *links,double *alpha, double *beta , double *gamma, struct vec3 *xyz, int num_of_links);
-
+void inverse_kinetic_calc(struct model * model, double des_xyz[3]) ;
  struct vec3_list * forward_kinetic_for_chain(struct joint *current, struct link *first_joint_in_chain);
+void endeffector_grdient_decent(struct model *model, double *des_xyz,double alpha) ;
 //void forward_calc(struct joint *j1, struct joint *j2) ;
 struct model * init_robot() ;
 #ifdef __cplusplus

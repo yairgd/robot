@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
 
 	
-	forward_calc();
+//	forward_calc();
 	Screen screen(640*2,480*2);
 	SDL_Event event;
 	
@@ -58,17 +58,17 @@ int main(int argc, char* argv[]) {
 	screen.addShapeObject(shapeObject);
 
 //	shapeObject->rotate(0.01, 0.01, 0.001);		
-	shapeObject->rotate(0.0, 0.0, 0.00);	
+	shapeObject->rotate(0.1, 0.1, 0.00);	
 	double x=0,y=0,z=0;
 	while (true) {
 		screen.show();
 		screen.clear();
 		screen.processEvent(&event);
 		screen.draw();
-		shapeObject->rotate(0.1, 0.1, 0.1);		
+		//shapeObject->rotate(-0.1, 0.5, 0.5);		
 		//	shapeObject->rotate(0.0, 0.0, 0.00);	
 
-		//shapeObject->rotate(0.0, 0.0, 0.000);		
+		shapeObject->rotate(0.0, 0.0, 0.000);		
 
 //		shapeObject->rotate(0.0, 0.01, x+=0.001);		
 		SDL_Delay(30);

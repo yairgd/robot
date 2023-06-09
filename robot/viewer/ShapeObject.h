@@ -71,6 +71,7 @@ class ShapeObject {
 		double Rz=0;
 		std::vector<std::shared_ptr<IShape>> m_shapes;
 		vec3 m_centroid;
+		int rot_axis = 0;
 
 
 };

@@ -1,7 +1,6 @@
 PyQt5
-requests
-flask
-flask_io
 marshmallow_enum
 pyserial
 Jinja2
+numpy 
+sympy

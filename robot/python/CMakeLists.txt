@@ -11,6 +11,7 @@ set (PYTHON "/usr/bin/python3")
 	# studio project
 	set (python_SRC
 		${CMAKE_SOURCE_DIR}/robot/python/src/robot.c	
+		${CMAKE_SOURCE_DIR}/robot/python/src/model.c	
 		)
 
 	

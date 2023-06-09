@@ -88,10 +88,57 @@ void ShapeObject::processEvent(SDL_Event  * event)  {
 
 			}
 			break;
-			}
-			//}
+
+				case 0000: //SDL_KEYDOWN:
+				switch (event->key.keysym.sym) {
+					case SDLK_x:
+						rot_axis = 0;
+						break;
+					case SDLK_y:
+						rot_axis = 1;
+						break;
+					case SDLK_z:
+						rot_axis = 2;
+						break;					
+					case SDLK_UP:
+						switch  (rot_axis) {
+							case 0: Rz+=0.01;break;
+							case 1: Rz+=0.01;break;
+							case 2: Rx+=0.01;break;
+						}
+						rotate(Rx,Ry,Rz);
+						break;
+					case SDLK_DOWN:
+						switch  (rot_axis) {
+							case 0: Rz-=0.01;break;
+							case 1: Rz-=0.01;break;
+							case 2: Rx-=0.01;break;
+						}
+						rotate(Rx,Ry,Rz);						
+						break;
+					case SDLK_LEFT:
+						switch  (rot_axis) {
+							case 0: Ry+=0.01;break;
+							case 1: Rx+=0.01;break;
+							case 2: Ry+=0.01;break;
+						}
+						rotate(Rx,Ry,Rz);
+						break;
+					case SDLK_RIGHT:
+						switch  (rot_axis) {
+							case 0: Ry-=0.01;break;
+							case 1: Rx-=0.01;break;
+							case 2: Ry-=0.01;break;
+						}
+						rotate(Rx,Ry,Rz);						
+						break;
 
 
+
+
+				}
+			break;
+		}
 }
 
 
@@ -159,7 +206,7 @@ void ShapeObject::rotate(float x , float y, float z) {
 		p.dst.z += m_centroid.z;
 	};	
 	for ( auto   s : m_shapes) {
-		s->update();
+		//		s->update();
 		auto  & points = s->getPoints();
 		for (auto &p : points) {
 			do_rotate(p);

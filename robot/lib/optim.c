@@ -364,12 +364,12 @@ struct model * init_robot() {
 	*p1 = 0.100000;
 	*p2 = 0.401455;
 	*p3 = 0.666982;
-	*g1 = 0.0;
+	*g1 = 0;
 	struct joint *  j1 = ( struct joint *) malloc (sizeof(struct joint));
 	*j1 = (struct joint) {
 		.name = (char*)"joint1",
 			.type = JOINT_FIXED,
-			.rpy = {0,0,0} , /*{PI,0,PI/2}, 		*/
+			.rpy = {PI,PI/2,0} , /*{PI,0,PI/2}, 		*/
 			.origin = {0,0,0},
 			.child = {
 				.link = {0},
@@ -577,6 +577,7 @@ void joint_translation_matrix(struct joint *j) {
 	list->p.x = *MAT(current->translation_matrix,0,3);
 	list->p.y = *MAT(current->translation_matrix,1,3);
 	list->p.z = *MAT(current->translation_matrix,2,3);
+	list->joint = current;
 	/*
 	if we want forwad connection - not needed
 	if (list_next)
@@ -679,7 +680,28 @@ void endeffector_grdient_decent(struct model *model, double *des_xyz,double alph
 		vec3_list_free(list);
 		k--;
 
-		printf ("%d %lf %lf %lf %lf %lf %lf %lf %lf\n", 100000- k,norm,xyz_new[0], xyz_new[1], xyz_new[2], rad2deg(phi[0]), rad2deg(phi[1]), rad2deg(phi[2]), (xyz_new[0]-des_xyz[0]) * (xyz_new[0]-des_xyz[0])  + (xyz_new[1]-des_xyz[1]) * (xyz_new[1]-des_xyz[1]) );		
+		//printf ("%d %lf %lf %lf %lf %lf %lf %lf %lf\n", 100000- k,norm,xyz_new[0], xyz_new[1], xyz_new[2], rad2deg(phi[0]), rad2deg(phi[1]), rad2deg(phi[2]), (xyz_new[0]-des_xyz[0]) * (xyz_new[0]-des_xyz[0])  + (xyz_new[1]-des_xyz[1]) * (xyz_new[1]-des_xyz[1]) );		
+	}
+}
+
+
+
+void inverse_kinetic_calc(struct model * model, double des_xyz[3]) {
+	struct vec3_list *list,*next;
+
+	endeffector_grdient_decent (model, des_xyz, 0.001);
+	
+	list = forward_kinetic_for_chain (model->endeffector, model->base_link);
+	des_xyz[0] = list->p.x;
+	des_xyz[1] = list->p.y;
+	des_xyz[2] = list->p.x;
+
+
+	while (list) {
+		//printf ("xyz: %lf, %lf,  %lf\n", list->p.x, list->p.y , list->p.z);
+		next=list->next;
+		free(list);
+		list = next;
 	}
 }
 

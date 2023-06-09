@@ -28,6 +28,9 @@
 
 
 void Robot::update( )   {
+	// inverse_kinetic_calc(model,  des_xyz) ;
+	
+#if 0
 	//auto s = reinterpret_cast<Screen *>(screen);
 	
 	//CoordinateSystem cs(s, 150,150,300,300);
@@ -48,6 +51,7 @@ void Robot::update( )   {
 	des_xyz[0] = xyz[2].x;
 	des_xyz[1] = xyz[2].y;
 	des_xyz[2] = xyz[2].z;
+#endif
 #if 0
 	
 

@@ -22,19 +22,11 @@
 #include <numpy/arrayobject.h>
 #include "git.h"
 
+#include "model.h"
 
 //np in c example
 //https://stuff.mit.edu/afs/sipb/project/python/src/python-numeric-22.0/doc/www.pfdubois.com/numpy/html2/numpy-13.html
-void * getStrategyType() ;
-void * getTickDataType() ;
-void * getPerformanaceManagerType();
-void * getTechIndicatorType();
-void * getStrategyTesterType();
-void * getTagType();
-void * getParameterType();
-void * getOutputType();
-void * getModelType();
-
+//void * getModelType() ;
 
 
 
@@ -170,17 +162,17 @@ PyInit_robot_c(void)
 
 	m = PyModule_Create(&robot_c);
 	
-	/* register of class inside the module 
-	PyTypeObject *StrategyType = getStrategyType();	
-	if (PyType_Ready(StrategyType) < 0)
+	//register of class inside the module 
+	PyTypeObject *ModelType = getModelType();	
+	if (PyType_Ready(ModelType) < 0)
 		return NULL;
 	Py_INCREF(&robot_c);
-	if (PyModule_AddObject(m, "Strategy", (PyObject *) StrategyType) < 0) {
+	if (PyModule_AddObject(m, "Model", (PyObject *) ModelType) < 0) {
 		Py_DECREF(&robot_c);
 		Py_DECREF(m);
 		return NULL;
 	}
-	*/
+	
 
 
 
@@ -196,7 +188,7 @@ PyInit_robot_c(void)
 	*/
 
 	// use to initilize numpyt array system
-	import_array();
+//	import_array();
 	return m;
 
 
