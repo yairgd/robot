@@ -82,7 +82,12 @@ class Robot: public IShape {
 		virtual std::vector< point > &  getPoints() override {
 			struct vec3_list *list,*next;
 
-			//endeffector_grdient_decent (model, des_xyz, 0.001);
+			static int cnt = 0;
+
+//			if (cnt++ % 100 != 0)
+//				return points;
+
+			endeffector_grdient_decent (model, des_xyz, 0.001);
 
 			list = forward_kinetic_for_chain (model->endeffector, model->base_link);
 			
@@ -129,23 +134,23 @@ void processEvent(SDL_Event  * event) override {
 
 					case SDLK_UP:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Up was pressed");
 						des_xyz[1] +=0.1;
-						model->variables[1] +=0.1;	
+						//model->variables[1] +=0.1;	!!
 
 						//	printf("inrease !!\n");
 						break;
 					case SDLK_DOWN:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Down was pressed");
 						       //printf("decrease !!\n");								       // 
 						des_xyz[1] -=0.1;
-						model->variables[1] -=0.1;	
+						//model->variables[1] -=0.1;	 !!
 
 						break;
 					case SDLK_LEFT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Left was pressed");
 						des_xyz[0] -=0.1;	
-						model->variables[3] -=0.1;	
+						//model->variables[3] -=0.1;	 !!
 						break;
 					case SDLK_RIGHT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Right was pressed");
 						des_xyz[0] +=0.1;	
-						model->variables[3] +=0.1;							
+						//model->variables[3] +=0.1;	!!						 
 						break;
 					default:;
 				}

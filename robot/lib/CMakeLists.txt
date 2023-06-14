@@ -2,6 +2,7 @@ set ( robot_SRC
 	./matrix.c
 	./optim.c
 	../../generated/jacobian.c
+	../../generated/output.c
 )
 
 

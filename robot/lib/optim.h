@@ -33,7 +33,7 @@ struct parameter {
 
 float parameter_get(struct parameter  *p);
 void parameter_set_conststant(struct parameter *p, float *v, float coeff);
-
+int parameter_is_constant(struct parameter *p) ;
 
 
 enum joint_type {
@@ -127,6 +127,9 @@ void inverse_kinetic_calc(struct model * model, double des_xyz[3]) ;
 void endeffector_grdient_decent(struct model *model, double *des_xyz,double alpha) ;
 //void forward_calc(struct joint *j1, struct joint *j2) ;
 struct model * init_robot() ;
+
+
+void forward_calc1();
 #ifdef __cplusplus
 }
 #endif

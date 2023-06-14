@@ -66,6 +66,55 @@ Model_get(Model* self,PyObject *args, PyObject *kwds)
 		PyObject* pyValue = PyUnicode_FromString(list->joint->name);
 		PyDict_SetItemString(joint, "name", pyValue);
 
+
+		/* add axis values into a list */
+		PyObject* PyListRpy = PyList_New(0);
+		if (!PyListRpy)
+			Py_RETURN_NONE;
+		PyList_Append (PyListRpy,  Py_BuildValue("d", list->joint->rpy.x ));
+		PyList_Append (PyListRpy,  Py_BuildValue("d", list->joint->rpy.y ));
+		PyList_Append (PyListRpy,  Py_BuildValue("d", list->joint->rpy.z ));
+		PyDict_SetItemString(joint, "rpy", PyListRpy);
+
+
+		/* add axis values into a list */
+		PyObject* PyOrigin = PyList_New(0);
+		if (!PyOrigin)
+			Py_RETURN_NONE;
+		PyList_Append (PyOrigin,  Py_BuildValue("d", list->joint->origin.x ));
+		PyList_Append (PyOrigin,  Py_BuildValue("d", list->joint->origin.y ));
+		PyList_Append (PyOrigin,  Py_BuildValue("d", list->joint->origin.z ));
+		PyDict_SetItemString(joint, "origin", PyOrigin);
+
+
+		// add axis values into a list
+		PyObject* PyListAxis = PyList_New(0);
+		if (!PyListAxis)
+			Py_RETURN_NONE;
+		if (parameter_is_constant(&list->joint->axis.x ))
+			PyList_Append (PyListAxis,  Py_BuildValue("d", parameter_get(&list->joint->axis.x) ));
+		else
+			PyList_Append (PyListAxis,  Py_BuildValue("s", "Rx" ));
+
+		if (parameter_is_constant(&list->joint->axis.y ))
+			PyList_Append (PyListAxis,  Py_BuildValue("d", parameter_get(&list->joint->axis.y) ));
+		else
+			PyList_Append (PyListAxis,  Py_BuildValue("s", "Ry" ));
+
+
+		if (parameter_is_constant(&list->joint->axis.z ))
+			PyList_Append (PyListAxis,  Py_BuildValue("d", parameter_get(&list->joint->axis.z) ));
+		else
+			PyList_Append (PyListAxis,  Py_BuildValue("s", "Rz" ));
+
+
+
+
+
+		PyDict_SetItemString(joint, "axis", PyListAxis);
+		
+
+
 		/*
 		   PyDict_SetItemString(joint, "cx",  PyBool_FromLong (cos (list->joint->axis.x )));
 		   PyDict_SetItemString(joint, "cy",  PyBool_FromLong (sin (list->joint->axis.y )));

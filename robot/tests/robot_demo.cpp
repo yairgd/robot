@@ -32,11 +32,15 @@
 extern "C" {
 void forward_calc() ;
 }
+void forward_calc1() ;
 int main(int argc, char* argv[]) {
 
 
 	
-//	forward_calc();
+	//forward_calc();
+	forward_calc1();
+
+	return 0;
 	Screen screen(640*2,480*2);
 	SDL_Event event;
 	
