@@ -38,9 +38,9 @@ int main(int argc, char* argv[]) {
 
 	
 	//forward_calc();
-	forward_calc2();
+	//forward_calc2();
 
-	return 0;
+	//return 0;
 	Screen screen(640*2,480*2);
 	SDL_Event event;
 	

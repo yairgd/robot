@@ -21,8 +21,12 @@
 #include <stdlib.h>
 #include <strings.h>
 #include "matrix.h"
+#include "optimization.h"
 #include "optim.h"
+#include <string.h>
 
+
+static struct gradient_info  * endeffector_cost_function_gradient_info = 0;
 
 /**
  * Created  06/13/2023
@@ -74,6 +78,7 @@ struct vec3_list * forward_kinetic(double *var_value)
 
 
 
+
 /**
  * Created  06/13/2023
  * @brief   claclaue the gradient for mean squre error (MSE) cost function between current location to destanation.
@@ -85,6 +90,8 @@ void endeffector_cost_function_gradient(double *des_xyz, double *var_value,  dou
 	double x = des_xyz[0];
 	double y = des_xyz[1];
 	double z = des_xyz[2];
+
+	(void)n;
 	double Ry_0 = var_value[0]  ;
 	double Rz_1 = var_value[1]  ;
 	double Rz_2 = var_value[2]  ;
@@ -100,3 +107,39 @@ void endeffector_cost_function_gradient(double *des_xyz, double *var_value,  dou
 	grad[3] = 12.0*(-x - (4.0*cos(Rz_1) + 6.0*cos(Rz_1 + Rz_2) + 6.0*cos(Rz_1 + Rz_2 + Rz_3))*sin(Ry_0))*sin(Ry_0)*sin(Rz_1 + Rz_2 + Rz_3) - 12.0*(-z + (4.0*cos(Rz_1) + 6.0*cos(Rz_1 + Rz_2) + 6.0*cos(Rz_1 + Rz_2 + Rz_3))*cos(Ry_0))*sin(Rz_1 + Rz_2 + Rz_3)*cos(Ry_0) - 72.0*(-0.166666666666667*y - 0.666666666666667*sin(Rz_1) - sin(Rz_1 + Rz_2) - sin(Rz_1 + Rz_2 + Rz_3))*cos(Rz_1 + Rz_2 + Rz_3);
         
 }
+
+
+
+/**
+ * Created  06/15/2023
+ * @brief   genrrates the gradient infor structure to use 
+ * @param   
+ * @return  
+ */
+struct gradient_info * get_endeffector_cost_function_gradient_info(double des_xyz[3]) {
+	if (endeffector_cost_function_gradient_info == 0) {
+		endeffector_cost_function_gradient_info = malloc(sizeof(struct gradient_info));
+		endeffector_cost_function_gradient_info->num_of_variable = 4;
+		endeffector_cost_function_gradient_info->variables = malloc(sizeof(double) * 4);
+		memset (endeffector_cost_function_gradient_info->variables, 0 , 4 * sizeof ( double));				
+		endeffector_cost_function_gradient_info->gradient = endeffector_cost_function_gradient;
+	}
+	for (int i =0;i<3;i++)
+		endeffector_cost_function_gradient_info->des_xyz[i] = des_xyz[i];
+	return endeffector_cost_function_gradient_info;
+}
+
+
+/**
+ * Created  06/15/2023
+ * @brief   release the memory of endeffector_cost_function_gradient_info
+ * @param   
+ * @return  
+ */
+void put_endeffector_cost_function_gradient_info() {
+	free(endeffector_cost_function_gradient_info);
+
+	endeffector_cost_function_gradient_info = 0;
+}
+
+
