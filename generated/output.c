@@ -80,7 +80,7 @@ struct vec3_list * forward_kinetic(double *var_value)
  * @param   
  * @return  
  */
-void endeffector_cost_function_gradient(double *des_xyz, double *var_value,  double *grad) 
+void endeffector_cost_function_gradient(double *des_xyz, double *var_value,  double *grad, int n) 
 {
 	double x = des_xyz[0];
 	double y = des_xyz[1];

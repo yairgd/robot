@@ -31,14 +31,14 @@
 
 extern "C" {
 void forward_calc() ;
+void forward_calc2() ;
 }
-void forward_calc1() ;
 int main(int argc, char* argv[]) {
 
 
 	
 	//forward_calc();
-	forward_calc1();
+	forward_calc2();
 
 	return 0;
 	Screen screen(640*2,480*2);

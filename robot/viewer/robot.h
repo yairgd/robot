@@ -87,7 +87,7 @@ class Robot: public IShape {
 //			if (cnt++ % 100 != 0)
 //				return points;
 
-			endeffector_grdient_decent (model, des_xyz, 0.001);
+			//endeffector_grdient_decent (model, des_xyz, 0.001); TODO CHANGE
 
 			list = forward_kinetic_for_chain (model->endeffector, model->base_link);
 			
