@@ -23,13 +23,14 @@
 extern "C" {
 #endif
 struct gradient_info {
-	 void (*gradient)(double * des_xyz, double * var_value, double *  gradient, int n);
-	 double *des_xyz;
+	 void (*gradient)(double * des_xyz, double * var_value, double *  gradient, int n, void *data);
+	 double des_xyz[3];
 	 double *variables;
 	 int num_of_variable;
+	 void *data;
 } ;
 
-void	gradient_decent(struct  gradient_info *, double *grad, double alpha,int max_iter) ;
+void gradient_decent(struct  gradient_info *, double alpha,int max_iter);
 void forward_calc2() ;
 
 #ifdef __cplusplus

@@ -23,6 +23,8 @@
 #include "screen.h"
 #include "IShape.h"
 #include "optim.h"
+#include "optimization.h"
+#include "template.h"
 
 #include  <thread>
 #include  <chrono>
@@ -39,14 +41,18 @@ class Robot: public IShape {
 		std::vector<point> points; 
 		std::vector<connection> connectios;
 
-		double des_xyz[3] = { 12.411930818340064, 7.603239324984113,0};
+		//double des_xyz[3] = { 12.411930818340064, 7.603239324984113,0};
+		struct gradient_info * info = get_endeffector_cost_function_gradient_info((double [3]){-2.437466, -4.519042,  11.326713});
+
+
 //		double links[3]={4.0,6.0,6.0};
 //		vec3 xyz[4]={0};
 
 		//double phi[] = {0.000000, 0.401455, 0.666982};
 
 //		double phi[3] = {0.000000, 0.401455, 0.666982};
-		struct model * model =  init_robot();
+		//struct model * model =  init_robot();
+		bool has_change = true;	
 
 
 	public:
@@ -71,6 +77,7 @@ class Robot: public IShape {
 
 			};
 
+
 			//	points.push_back({{0,0,0},{0,0,0}});
 			//	points.push_back({{0,0,0},{0,0,0}});
 			//	points.push_back({{0,0,0},{0,0,0}});
@@ -81,16 +88,25 @@ class Robot: public IShape {
 		}
 		virtual std::vector< point > &  getPoints() override {
 			struct vec3_list *list,*next;
+			if (!has_change)
+				return points;
+			has_change = false;
 
-			static int cnt = 0;
+			//static int cnt = 0;
+			//double grad[4];
 
 //			if (cnt++ % 100 != 0)
 //				return points;
 
 			//endeffector_grdient_decent (model, des_xyz, 0.001); TODO CHANGE
 
-			list = forward_kinetic_for_chain (model->endeffector, model->base_link);
+			gradient_decent (info , 0.001,10000);
 			
+			//list = forward_kinetic_for_chain (model->endeffector, model->base_link);
+			list =  forward_kinetic(info->variables);
+			
+	
+
 			int k = 0;
 			while (list) {
 				points[k++].src = list->p;
@@ -110,9 +126,9 @@ class Robot: public IShape {
 			double *beta=0;
 
 			//forward_kinematic(links,alpha, beta , phi, xyz, 3) ;
-			des_xyz[0] = points[0].src.x;
-			des_xyz[1] = points[0].src.y;
-			des_xyz[2] = points[0].src.z;
+			info->des_xyz[0] = points[0].src.x;
+			info->des_xyz[1] = points[0].src.y;
+			info->des_xyz[2] = points[0].src.z;
 			//ints.clear();
 			//ints.push_back({0,0,0},{0,0,0}};
 			//for (int i =0; i < 4; i++) {
@@ -133,23 +149,31 @@ void processEvent(SDL_Event  * event) override {
 				{
 
 					case SDLK_UP:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Up was pressed");
-						des_xyz[1] +=0.1;
+						info->des_xyz[1] +=0.1;
+						has_change = true;
+
 						//model->variables[1] +=0.1;	!!
 
 						//	printf("inrease !!\n");
 						break;
 					case SDLK_DOWN:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Down was pressed");
 						       //printf("decrease !!\n");								       // 
-						des_xyz[1] -=0.1;
+						info->des_xyz[1] -=0.1;
+						has_change = true;
+
 						//model->variables[1] -=0.1;	 !!
 
 						break;
 					case SDLK_LEFT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Left was pressed");
-						des_xyz[0] -=0.1;	
+						info->des_xyz[0] -=0.1;	
+						has_change = true;
+
 						//model->variables[3] -=0.1;	 !!
 						break;
 					case SDLK_RIGHT:// keyText = loadText(255, 200, 50, "lazy.ttf", 50, "Right was pressed");
-						des_xyz[0] +=0.1;	
+						info->des_xyz[0] +=0.1;	
+						has_change = true;
+
 						//model->variables[3] +=0.1;	!!						 
 						break;
 					default:;
