@@ -15,8 +15,9 @@
  *
  * =====================================================================================
  */
-
 #include "model.h"
+#include "lib/model.h"
+#include "lib/optimization.h"
 
 #include <stddef.h>
 #include "Python.h"
@@ -168,7 +169,7 @@ Model_forward_kinetic(Model* self,PyObject *args, PyObject *kwds)
 		if (xyz == NULL) {
 			PyErr_Print();
 			Py_DECREF(PyList);
-			return 1;
+			Py_RETURN_NONE;
 		}
 
 		PyTuple_SetItem (xyz, 0, Py_BuildValue("(d)", list->p.x ));

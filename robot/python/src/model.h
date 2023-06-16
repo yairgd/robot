@@ -21,7 +21,7 @@
 
 #include <Python.h>
 #include <structmember.h>
-#include "optim.h"
+#include "model.h"
 
 
 /* Type definition */

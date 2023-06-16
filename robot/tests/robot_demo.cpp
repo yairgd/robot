@@ -26,19 +26,18 @@
 #include "ShapeObject.h"
 
 #include "screen.h"
-#include "optim.h"
+#include "template.h"
+#include "optimization.h"
 
 
-extern "C" {
-void forward_calc() ;
-void forward_calc2() ;
-}
+
 int main(int argc, char* argv[]) {
 
-
-	
-	//forward_calc();
-	//forward_calc2();
+#if 0
+	double arr [3]  = {-2.437466, -4.519042,  11.326713};
+	struct gradient_info * info = gradient_info_init(arr)	
+	forward_calc(info);
+#endif
 
 	//return 0;
 	Screen screen(640*2,480*2);

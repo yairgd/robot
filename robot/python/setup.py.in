@@ -19,7 +19,7 @@ else:
     macro=[]
 
 robot_c = Extension("robot_c", 
-                                 include_dirs=['${CMAKE_SOURCE_DIR}/' ,  '${CMAKE_SOURCE_DIR}/../',  '${CMAKE_SOURCE_DIR}/'  ,'${CMAKE_BINARY_DIR}/','${CMAKE_SOURCE_DIR}/robot/lib'  ,'/usr/lib/python3.10/site-packages/numpy/core/include/'   ],
+                                 include_dirs=['${CMAKE_SOURCE_DIR}/' ,  '${CMAKE_SOURCE_DIR}/../',  '${CMAKE_SOURCE_DIR}/'  ,'${CMAKE_BINARY_DIR}/','${CMAKE_SOURCE_DIR}/robot'  ,'/usr/lib/python3.10/site-packages/numpy/core/include/'   ],
                                  extra_compile_args=compile_args,   
                                  sources= ["${CMAKE_SOURCE_DIR}/robot/python/src/robot.c",
                                           "${CMAKE_SOURCE_DIR}/robot/python/src/model.c" 

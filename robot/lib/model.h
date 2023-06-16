@@ -21,18 +21,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "matrix.h"
+#include "optimization.h"
+
 #include <stdlib.h>
-#define PI 3.141592653589793
 
 
 struct parameter {
-	float coefficient;
-	float *val;
+	double coefficient;
+	double *val;
 };
 
-float parameter_get(struct parameter  *p);
-void parameter_set_conststant(struct parameter *p, float *v, float coeff);
+double parameter_get(struct parameter  *p);
+void parameter_set_conststant(struct parameter *p, double *v, double coeff);
 int parameter_is_constant(struct parameter *p) ;
 
 
@@ -44,11 +44,11 @@ struct model {
 	struct link *base_link;
 	struct joint *endeffector;
 	int num_of_variable;
-	float *variables;
+	double *variables;
 };
 struct model  * model_new(int n);
 void model_free(struct model *);
-
+struct gradient_info * numeric_model__get_gradient_info_init(struct model *model, double des_xyz[3]);
 
 
 
@@ -105,11 +105,7 @@ struct joint {
 };
 
 
-struct vec3_list {
-	struct vec3 p;
-	struct joint *joint;
-	struct vec3_list *next;
-};
+
 
 
 void joint_set_parent_link(struct joint *j, struct link *l) ;

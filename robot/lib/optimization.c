@@ -18,7 +18,6 @@
 
 #include "optimization.h"
 #include "template.h"
-#include "optim.h"  //TODO depricated to remove
 
 #include <stdlib.h>
 #include <math.h>
@@ -26,6 +25,21 @@
 #include <string.h>
 
 
+
+/**
+ * Created  06/16/2023
+ * @brief   release vec3_list linked list
+ * @param   
+ * @return  
+ */
+void vec3_list_free(struct vec3_list *list) {
+	struct vec3_list *next;
+	while (list) {
+		next=list->next;
+		free(list);
+		list = next;
+	}
+}
 
 /**
  * Created  06/01/2023
@@ -36,7 +50,7 @@
 void  gradient_decent(struct gradient_info *info, double alpha, int max_iter) 
 {
 	double norm;
-	double  xyz_new[3];
+	double  xyz_new[3] = {0};
 	int k = max_iter;
 	struct vec3_list *list;
 	double * vars = info->variables;	
@@ -62,7 +76,7 @@ void  gradient_decent(struct gradient_info *info, double alpha, int max_iter)
 		double err = 0.001;
 		if (norm < err*err)
 			break;
-		list =  forward_kinetic(info->variables);
+		list =  info->forward_kinetic(info->variables, info->data);
 
 		xyz_new[0] =  list->p.x;
 		xyz_new[1] =  list->p.y;
@@ -76,32 +90,37 @@ void  gradient_decent(struct gradient_info *info, double alpha, int max_iter)
 }
 
 
+struct vec3_list *  forward_kinetic(struct gradient_info *info)
+{
+	return info->forward_kinetic(info->variables,info->data);
+}
 
-void forward_calc2() {
+
+void forward_calc(struct gradient_info * info) {
 	struct vec3_list *next;
-	double des_xyz [3]= {-2.437466, -4.519042,  11.326713};
-	double grad[4];
-	double variables[4];
 
-	struct gradient_info * info = get_endeffector_cost_function_gradient_info((double [3]){-2.437466, -4.519042,  11.326713});
-	for (int i=0;i<3;i++)
-		info->des_xyz[i] = des_xyz[i];
-
-	/*
-	info->des_xyz = des_xyz;
-	info->num_of_variable = 4;
-	info->des_xyz = des_xyz;
-	info->variables = variables;
-	info->gradient = endeffector_cost_function_gradient;
-	*/
 
 	gradient_decent (info , 0.001,10000);
-	struct vec3_list * list =  forward_kinetic(info->variables);
+	struct vec3_list * list =  info->forward_kinetic(info->variables, info->data);
 	while (list) {
 		printf ("xyz: %lf, %lf,  %lf\n", list->p.x, list->p.y , list->p.z);
 		next=list->next;
 		free(list);
 		list = next;
 	}	
+}
+
+
+
+/**
+ * Created  06/15/2023
+ * @brief   release the memory of endeffector_cost_function_gradient_info
+ * @param   
+ * @return  
+ */
+void free_gradient_info(struct gradient_info * info) {
+	free(info->variables);
+	free(info);
+
 }
 

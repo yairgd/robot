@@ -23,10 +23,7 @@
 extern "C" {
 #endif
 
-struct gradient_info * get_endeffector_cost_function_gradient_info(double[3]);
-void put_endeffector_cost_function_gradient_info() ;
-struct vec3_list * forward_kinetic(double *var_value);
-void  endeffector_cost_function_gradient( double *des_xyz, double *var_value,  double *grad, int n, void *data); 
+struct gradient_info * gradient_info_init(double[3]);
 
 
 #ifdef __cplusplus

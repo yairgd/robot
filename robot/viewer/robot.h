@@ -22,7 +22,7 @@
 #include <vector>
 #include "screen.h"
 #include "IShape.h"
-#include "optim.h"
+#include "model.h"
 #include "optimization.h"
 #include "template.h"
 
@@ -42,16 +42,16 @@ class Robot: public IShape {
 		std::vector<connection> connectios;
 
 		//double des_xyz[3] = { 12.411930818340064, 7.603239324984113,0};
-		struct gradient_info * info = get_endeffector_cost_function_gradient_info((double [3]){-2.437466, -4.519042,  11.326713});
+		
+#if 1
+		struct gradient_info * info = gradient_info_init((double [3]){ 12.411930818340064, 7.603239324984113,0});
+#else
+		struct model * model =  init_robot();
+		struct gradient_info *  info  = numeric_model__get_gradient_info_init(model, (double [3]){12.411930818340064, 7.603239324984113,0}) ;
+#endif
 
+		//-2.437466, -4.519042,  0
 
-//		double links[3]={4.0,6.0,6.0};
-//		vec3 xyz[4]={0};
-
-		//double phi[] = {0.000000, 0.401455, 0.666982};
-
-//		double phi[3] = {0.000000, 0.401455, 0.666982};
-		//struct model * model =  init_robot();
 		bool has_change = true;	
 
 
@@ -77,14 +77,7 @@ class Robot: public IShape {
 
 			};
 
-
-			//	points.push_back({{0,0,0},{0,0,0}});
-			//	points.push_back({{0,0,0},{0,0,0}});
-			//	points.push_back({{0,0,0},{0,0,0}});
-			//	points.push_back({{0,0,0},{0,0,0}});
-
-			// Calaculate centroid
-			//findCentroid();
+	
 		}
 		virtual std::vector< point > &  getPoints() override {
 			struct vec3_list *list,*next;
@@ -92,18 +85,12 @@ class Robot: public IShape {
 				return points;
 			has_change = false;
 
-			//static int cnt = 0;
-			//double grad[4];
 
-//			if (cnt++ % 100 != 0)
-//				return points;
-
-			//endeffector_grdient_decent (model, des_xyz, 0.001); TODO CHANGE
 
 			gradient_decent (info , 0.001,10000);
 			
 			//list = forward_kinetic_for_chain (model->endeffector, model->base_link);
-			list =  forward_kinetic(info->variables);
+			list =  forward_kinetic(info);
 			
 	
 
@@ -117,24 +104,15 @@ class Robot: public IShape {
 			}
 
 
-			//inverse_kinetic_calc(model,  des_xyz) ;
-
-			//			calc_grdient_decent(phi,links, des_xyz,0.001);
-			//jacobian_pseudoinverse_optimization(phi,links, des_xyz,3,0.001);
+		
 
 			double *alpha=0;
 			double *beta=0;
 
-			//forward_kinematic(links,alpha, beta , phi, xyz, 3) ;
 			info->des_xyz[0] = points[0].src.x;
 			info->des_xyz[1] = points[0].src.y;
 			info->des_xyz[2] = points[0].src.z;
-			//ints.clear();
-			//ints.push_back({0,0,0},{0,0,0}};
-			//for (int i =0; i < 4; i++) {
-			//	points[i].src = xyz[i];
-			//}
-			//std::this_thread::sleep_for(100ms);
+			
 			return points;
 }		
 

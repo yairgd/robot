@@ -1,8 +1,8 @@
 set ( robot_SRC 
 	./matrix.c
-	./optim.c
+	./model.c
 	./optimization.c
-	../../generated/jacobian.c
+	#	../../generated/jacobian.c
 	../../generated/output.c
 )
 

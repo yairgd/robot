@@ -20,7 +20,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "matrix.h"
-#include "optim.h"
+#include "model.h"
 
 
 
@@ -37,7 +37,7 @@ double phi[] = {0.000000, 0.401455, 0.666982};
 
 //	calc_grdient_decent(phi,links, des_xyz,0.001);
 
-	jacobian_pseudoinverse_optimization(phi, links, des_xyz,3,0.001);
+	//jacobian_pseudoinverse_optimization(phi, links, des_xyz,3,0.001);
 
 
 
