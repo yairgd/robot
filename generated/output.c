@@ -25,7 +25,6 @@
 #include <string.h>
 
 
-// struct gradient_info  * endeffector_cost_function_gradient_info = 0;
 
 /**
  * Created  06/13/2023
@@ -119,20 +118,18 @@ static void endeffector_cost_function_gradient(double *des_xyz, double *var_valu
  * @return  
  */
 struct gradient_info * gradient_info_init(double des_xyz[3]) {
-	struct gradient_info  * endeffector_cost_function_gradient_info = 0;
-	if (endeffector_cost_function_gradient_info == 0) {
-		endeffector_cost_function_gradient_info = malloc(sizeof(struct gradient_info));
-		endeffector_cost_function_gradient_info->num_of_variable = 4;
-		endeffector_cost_function_gradient_info->variables = malloc(sizeof(double) * 4);
-		memset (endeffector_cost_function_gradient_info->variables, 0 , 4 * sizeof ( double));				
-		endeffector_cost_function_gradient_info->gradient = endeffector_cost_function_gradient;
-		endeffector_cost_function_gradient_info->forward_kinetic = model_forward_kinetic;
-
-	}
+	struct gradient_info  * info = 0;
+	info = malloc(sizeof(struct gradient_info));
+	info->num_of_variable = 4;
+	info->variables = malloc(sizeof(double) * 4);
+	memset (info->variables, 0 , 4 * sizeof ( double));				
+	info->gradient = endeffector_cost_function_gradient;
+	info->forward_kinetic = model_forward_kinetic;
 	for (int i =0;i<3;i++)
-		endeffector_cost_function_gradient_info->des_xyz[i] = des_xyz[i];
-	return endeffector_cost_function_gradient_info;
+		info->des_xyz[i] = des_xyz[i];
+	return info;
 }
+
 
 
 
