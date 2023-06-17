@@ -25,17 +25,18 @@ jobs:
       with:
         python-version: 3.8
 
-    - name: Install NumPy
+    - name: Install NumPy and python3-dev
       run: |
         python -m pip install --upgrade pip
         pip install numpy
+        sudo apt-get update
+        sudo apt-get install -y python3-dev
 
 
     - name: Install SDL2 dependencies
       run: sudo apt-get install -y libsdl2-dev
       
-    - name: Install python3-dev
-      run: sudo apt-get install -y python3-dev
+
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
