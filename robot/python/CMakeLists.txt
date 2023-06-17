@@ -31,6 +31,9 @@ set (PYTHON "/usr/bin/python3")
 		${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
 		${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
 		${CMAKE_CURRENT_SOURCE_DIR}/robot/__init__.py
+		${CMAKE_CURRENT_SOURCE_DIR}/robot/utils.py
+		${CMAKE_CURRENT_SOURCE_DIR}/robot/model.py
+		${CMAKE_CURRENT_SOURCE_DIR}/robot/generator/mse_gradient.py
 		)
 	configure_file(${SETUP_PY_IN} ${SETUP_PY})
 

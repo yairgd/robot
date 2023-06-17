@@ -1,14 +1,14 @@
 import math
 import numpy as np
 import sympy as sym
-import utils
+import robot
 from jinja2 import Template
 
 
 
-m = Model()
+m = robot.model.Model()
 m.load()
-mse_grad, forwad_kinetic,var_list =calc_gradient_mse_func(m);
+mse_grad, forwad_kinetic,var_list =robot.model.calc_gradient_mse_func(m);
 var_list = [str(var) for var  in  var_list]
 
 

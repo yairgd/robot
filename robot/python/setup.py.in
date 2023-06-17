@@ -40,6 +40,6 @@ setup(name=name, ext_modules=[robot_c],
        setup_requires=['wheel'],
        install_requires=['PyQt5','requests','flask','flask_io','marshmallow_enum','pyserial' ],
        version='${PACKAGE_VERSION}',
-       
+       py_modules=['robot.utils','robot.model','robot.generator.mse_gradient'], 
       )
 

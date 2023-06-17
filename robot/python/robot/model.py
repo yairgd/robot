@@ -2,7 +2,7 @@ import robot_c
 import math
 import numpy as np
 import sympy as sym
-import utils
+import robot.utils
 
 
 
@@ -63,7 +63,7 @@ def translation_matrix(joint,n):
     M1.simplify();
     for k in range(3):
             for l in range(3):
-                M1[k,l] = 0 if (type(M1[k,l]) == sympy.core.numbers.Float and math.fabs(M1[k,l])<0.0000001) else M1[k,l]
+                M1[k,l] = 0 if (type(M1[k,l]) == sym.core.numbers.Float and math.fabs(M1[k,l])<0.0000001) else M1[k,l]
                    # M1[k,l] = sym.symbols(str(M1[k,l]) + '_' + str(n)) if (type(M1[k,l]) != sympy.core.numbers.Float) else M1[k,l]
     xr,yr,zr,M2 = roate_pixel(xr,yr,zr,Rx1,Ry1,Rz1)
     xr.simplify();
@@ -72,7 +72,7 @@ def translation_matrix(joint,n):
     M2.simplify();
     for k in range(3):
             for l in range(3):
-                M2[k,l] = 0 if (type(M2[k,l]) == sympy.core.numbers.Float and math.fabs(M2[k,l])<0.0000001) else M2[k,l]
+                M2[k,l] = 0 if (type(M2[k,l]) == sym.core.numbers.Float and math.fabs(M2[k,l])<0.0000001) else M2[k,l]
     M = M1 * M2
     # update matrix    
     T[0,0] = M[0,0] ;
@@ -100,11 +100,11 @@ def translation_matrix(joint,n):
   #  v['Rz1'] = joint['axis'][2] if type(joint['axis'][2]) == float else sym.symbols(joint['axis'][2])
   #  T.subs(v)
     var_list = [];
-    if type(Rx1) == sympy.core.symbol.Symbol:
+    if type(Rx1) == sym.core.symbol.Symbol:
         var_list.append(Rx1);
-    if type(Ry1) == sympy.core.symbol.Symbol:
+    if type(Ry1) == sym.core.symbol.Symbol:
         var_list.append(Ry1);
-    if type(Rz1) == sympy.core.symbol.Symbol:
+    if type(Rz1) == sym.core.symbol.Symbol:
         var_list.append(Rz1);
     return T, var_list
 
@@ -142,7 +142,7 @@ def roate_pixel(x,y,z,Rx,Ry,Rz):
     M=Mx@My@Mz
     for k in range(3):
             for l in range(3):
-                M[k,l] = 0 if (type(M[k,l]) == sympy.core.numbers.Float and math.fabs(M[k,l])<0.0000001) else M[k,l]
+                M[k,l] = 0 if (type(M[k,l]) == sym.core.numbers.Float and math.fabs(M[k,l])<0.0000001) else M[k,l]
     mm =M*sym.Matrix([x,y,z])
     return mm[0,0],mm[1,0],mm[2,0],M
 
@@ -226,13 +226,13 @@ class Model(robot_c.Model):
         return grad, forwad_kinetic
 
 
-import importlib
-if __name__ == "__main__":
-importlib.reload(model)        
+#import importlib
+#if __name__ == "__main__":
+#importlib.reload(model)        
     
-import model
-m = model.Model()
-calc_gradient_mse_func(m)
+#import model
+#m = model.Model()
+#calc_gradient_mse_func(m)
 
 
 
