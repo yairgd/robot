@@ -25,22 +25,22 @@ namespace Hal {
 			return -1 ;
 		}
 		switch (m_settings.baud) {
-			case IUart::Settings::baud::BAUDRATE_115200: 
+			case BaudSettings::BAUDRATE_115200: 
 				{
 					_set_interface_attribs (m_fd , B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
 					break;
 				}
-			case IUart::Settings::baud::BAUDRATE_921600: 
+			case BaudSettings::BAUDRATE_921600: 
 				{
 					_set_interface_attribs (m_fd , B921600, 0);  // set speed to 115,200 bps, 8n1 (no parity)
 					break;
 				}
-			case IUart::Settings::baud::BAUDRATE_230400: 
+			case BaudSettings::BAUDRATE_230400: 
 				{
 					_set_interface_attribs (m_fd , B230400, 0);  // set speed to 115,200 bps, 8n1 (no parity)
 					break;
 				}
-			case IUart::Settings::baud::BAUDRATE_460800: 
+			case BaudSettings::BAUDRATE_460800: 
 				{
 					_set_interface_attribs (m_fd , B460800, 0);  // set speed to 115,200 bps, 8n1 (no parity)
 					break;
@@ -63,7 +63,7 @@ namespace Hal {
 	int UartLinux::Send(char *lpBuffer, int dNoOFBytestoWrite)   {
 		int size=1;
 		int err=0;
-
+	
 		int n =  write(m_fd,lpBuffer,dNoOFBytestoWrite);
 		if (n<0)
 			return -1;
@@ -125,7 +125,7 @@ namespace Hal {
 
 
 	std::shared_ptr<IUart> GetUart(std::string com_port) {
-		return std::make_shared<UartLinux> (com_port.c_str(), IUart::Settings({ IUart::Settings::baud::BAUDRATE_115200}));
+		return std::make_shared<UartLinux> (com_port.c_str(), Settings({ BaudSettings::BAUDRATE_115200}));
 	}
 
 };

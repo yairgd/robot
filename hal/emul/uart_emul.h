@@ -84,7 +84,7 @@ namespace Hal {
 			UartEmulator(Settings  && settings) {
 				m_settings = settings;
 				switch (settings.baud ) {
-					case IUart::Settings::baud::BAUDRATE_115200:
+					case BaudSettings::BAUDRATE_115200:
 						rate = 115200;
 						break;
 				}

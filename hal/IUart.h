@@ -20,12 +20,17 @@
 #include <memory>
 #include <string>
  namespace Hal {
-	class IUart {
-		public:
-			struct Settings {
-				enum baud {BAUDRATE_115200 = 0,BAUDRATE_921600, BAUDRATE_230400, BAUDRATE_460800} baud;
-			};
+	 
+	enum BaudSettings {BAUDRATE_115200 = 0,BAUDRATE_921600, BAUDRATE_230400, BAUDRATE_460800} ;
 
+	struct Settings {
+				BaudSettings baud;
+				//enum baud {BAUDRATE_115200 = 0,BAUDRATE_921600, BAUDRATE_230400, BAUDRATE_460800} baud;
+			};
+	class IUart {
+		
+		public:
+			
 		public:
 			virtual  int Open() = 0;		
 			virtual  void Close() = 0;		
@@ -35,7 +40,8 @@
 			virtual int Recevice( char *msg, int n) = 0;
 
 		protected:
-			Settings m_settings;
+			 Settings m_settings;
+
 
 	};
 

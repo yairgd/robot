@@ -1,0 +1,39 @@
+&clk_lse {
+	status = "okay";
+	clock-frequency = <32768>;
+};
+
+&clk_hse {
+	status = "okay";
+	clock-frequency = <25000000>;
+};
+
+&clk_hsi {
+	hsi-div = <1>;
+	status = "okay";
+	clock-frequency = <64000000>;
+};
+
+&pll {
+	div-m = <2>;
+	mul-n = <32>;
+	div-p = <2>;
+	div-q = <2>;
+	div-r = <2>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(200)>;
+
+	d1cpre = <1>;
+         hpre = <2>;
+         d1ppre = <1>;
+         d2ppre1 = <1>;
+         d2ppre2 = <1>;
+         d3ppre = <1>;
+};
+
+

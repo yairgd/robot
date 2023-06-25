@@ -19,6 +19,8 @@ set (CMAKE_CXX_STANDARD 17)
 #https://stackoverflow.com/questions/10046114/in-cmake-how-can-i-test-if-the-compiler-is-clang
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	add_definitions(-DSLEEP=sleep)
+	set (CMAKE_C_FLAGS  " -g -O0 ${CMAKE_C_FLAGS_DEBUG_INIT}  ${CMAKE_C_FLAGS_DEBUG}    " )
+	set (CMAKE_CXX_FLAGS  " -g -O0  ${CMAKE_CXX_FLAGS_DEBUG_INIT}  ${CMAKE_CXX_FLAGS_DEBUG}    " )
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	add_definitions(-DSLEEP=Sleep) 
@@ -47,6 +49,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
 
 	else() 
 		set (TARGET "LINUX_PC")	
+		add_definitions(-DLINUX_PC)
 	endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	set (UART_FILE uart_win.cpp)
@@ -55,8 +58,9 @@ endif()
 
 
 
-
+add_subdirectory (comm_protocol)
 add_subdirectory(Lapack)
+add_subdirectory(hal)
 add_subdirectory(robot)
 
 

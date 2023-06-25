@@ -11,7 +11,6 @@ endif()
 
 add_library (${PROJECT_NAME} STATIC
 	${SRC}
-	./../qrdecode.c
 	./uart_linux.cpp
 
 )
