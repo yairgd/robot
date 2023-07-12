@@ -41,21 +41,12 @@ namespace Simple {
 			void NewData(const MsgToParse &msg) override {
 				switch (msg.cmd) {
 
-					case CmdId::GetDeviceInfo:
-						{
 
-							 DeviceInfoData1 deviceInfoData;
-							auto msg = deviceInfoData();
-							int n = m_uart->Send(msg->buffer,msg->size()); 
-							(void)n;
 
-							break;
-						}
-#ifdef LINUX_PC
 					case CmdId::DeviceInfoData:
 						{
 							static int cnt = 0;
-							struct DeviceInfoData *di = (struct DeviceInfoData*)(msg.data.buffer);
+							Payload::DeviceInfoData *di = (Payload::DeviceInfoData*)(msg.data.buffer);
 							logger_print(LOG_INFO,"Get device Info Commnand : %d  sw ver: %d.%d.%d, hw_ver: %d.%d" ,cnt, di->sw_version[2],
 							     di->sw_version[1],
 							     di->sw_version[0],
@@ -66,7 +57,12 @@ namespace Simple {
 							cnt++;
 							break;
 						}
-#endif
+					case CmdId::AckNack:
+						{
+							logger_print(LOG_INFO,"AckNack");
+						}
+
+
 
 
 

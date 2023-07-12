@@ -25,7 +25,7 @@
 
 
 #include "protocol-v1/ProtocolStateMachine.h"
-#include "protocol-v1/HandleUartMsg.h"
+#include "common/HandleUartMsg.h"
 
 #include "common/ThreadPool.h"
 #include "common/logger.h"
@@ -38,7 +38,7 @@
 #include "signals.h"
 #endif
 
-#define UART_DEVICE "/dev/ttyACM1"
+#define UART_DEVICE "/dev/ttyACM0"
 
 int gg=0;
 void run_the_application() {
@@ -74,18 +74,32 @@ void run_the_application() {
 	});
 
 	threadPool->beginTask([uart, &m_exit]()->void{
-		auto robot = std::make_shared<Robot>(uart);		
+		auto robot = std::make_shared<::Robot>(uart);		
 
-		for (int i=0;i<100;i++) {
+		for (int i=0;i<0;i++) {
 			gg=1;
 			robot->getDeviceInfo(); // works
 			while (gg);
 
 		}
+		
+		// set servo location
+		ServoParams servoParams;
+		auto msg = servoParams();
+		msg->data.angle[0] = 40;
+		msg->data.update_bit = 1;
+		msg->data.min_pwm = 500;
+		msg->data.max_pwm = 2500;
+		robot->setMotorAngle(servoParams);
+		
+		usleep(100000);
 		m_exit = true;		
 		return;
 
 	});
+
+
+
 
 
 	logger_print(LOG_DEBUG,"joining %ld threads at ThreadPool",threadPool->size() );

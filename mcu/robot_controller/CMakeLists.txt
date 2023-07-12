@@ -18,15 +18,20 @@ set (PROJ_TOP ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_sources(app PRIVATE 
 	src/uart.c	
 	src/main.cpp
-	${PROJ_TOP}/comm_protocol/protocol-v1/ProtocolStateMachine.cpp
-	${PROJ_TOP}/hal/zephyr/uart_zephyr.cpp
+	src/pcb9685.cpp
+	src/servo.cpp
+	src/motor.cpp
+	${PROJ_TOP}/robot/comm_protocol/protocol-v1/ProtocolStateMachine.cpp
+	${PROJ_TOP}/robot/hal/zephyr/uart_zephyr.cpp
 )
 
 
 target_include_directories(app PRIVATE
 	${PROJ_TOP}/comm_protocol/
-	${PROJ_TOP}/hal
+	${PROJ_TOP}/robot/hal
 	${PROJ_TOP}/
+	${PROJ_TOP}/robot/comm_protocol/
+	${PROJ_TOP}/robot/
 	${PROJECT_BINARY_DIR}
 	)
 

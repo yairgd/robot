@@ -58,9 +58,8 @@ endif()
 
 
 
-add_subdirectory (comm_protocol)
 add_subdirectory(Lapack)
-add_subdirectory(hal)
+#add_subdirectory(hal)
 add_subdirectory(robot)
 
 

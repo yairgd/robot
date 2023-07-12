@@ -59,7 +59,7 @@ typedef struct _code {
 
 
 
-#ifdef __GNUC__
+#ifdef LINUX_PC
 #	include <sys/types.h>
 #	include <unistd.h>
 #   include <syslog.h>

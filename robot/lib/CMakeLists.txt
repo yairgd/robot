@@ -4,6 +4,8 @@ set ( robot_SRC
 	./optimization.c
 	#	../../generated/jacobian.c
 	../../generated/output.c
+	../common/HandleUartMsg.cpp
+	
 )
 
 
@@ -16,6 +18,10 @@ add_library(robot_static STATIC
 
 target_include_directories(robot_static PUBLIC 
 	./	
+	..
+	../common/
+	../comm_protocol/
+	../hal/
 )
 
 

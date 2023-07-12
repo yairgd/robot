@@ -15,7 +15,7 @@
  * =====================================================================================
  */
 #include "uart_zephyr.h"
-#include "../../mcu/hellow_world/src/uart.h"
+#include "../../mcu/robot_controller/src/uart.h"
 
 namespace Hal {
 	int UartZephyr::Open() {

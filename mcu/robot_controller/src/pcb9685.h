@@ -20,9 +20,10 @@
 
 #ifndef _ADAFRUIT_PWMServoDriver_H
 #define _ADAFRUIT_PWMServoDriver_H
+#include <stdint.h>
+#include <zephyr/drivers/i2c.h>
 
-#include <Adafruit_I2CDevice.h>
-#include <Arduino.h>
+
 
 // REGISTER ADDRESSES
 #define PCA9685_MODE1 0x00      /**< Mode Register 1 */
@@ -54,8 +55,7 @@
 #define MODE1_RESTART 0x80 /**< Restart enabled */
 // MODE2 bits
 #define MODE2_OUTNE_0 0x01 /**< Active LOW output enable input */
-#define MODE2_OUTNE_1                                                          \
-  0x02 /**< Active LOW output enable input - high impedience */
+#define MODE2_OUTNE_1 0x02 /**< Active LOW output enable input - high impedience */
 #define MODE2_OUTDRV 0x04 /**< totem pole structure vs open-drain */
 #define MODE2_OCH 0x08    /**< Outputs change on ACK vs STOP */
 #define MODE2_INVRT 0x10  /**< Output logic state inverted */
@@ -70,35 +70,38 @@
  *  @brief  Class that stores state and functions for interacting with PCA9685
  * PWM chip
  */
-class Adafruit_PWMServoDriver {
-public:
-  Adafruit_PWMServoDriver();
-  Adafruit_PWMServoDriver(const uint8_t addr);
-  Adafruit_PWMServoDriver(const uint8_t addr, TwoWire &i2c);
-  bool begin(uint8_t prescale = 0);
-  void reset();
-  void sleep();
-  void wakeup();
-  void setExtClk(uint8_t prescale);
-  void setPWMFreq(float freq);
-  void setOutputMode(bool totempole);
-  uint16_t getPWM(uint8_t num, bool off = false);
-  uint8_t setPWM(uint8_t num, uint16_t on, uint16_t off);
-  void setPin(uint8_t num, uint16_t val, bool invert = false);
-  uint8_t readPrescale(void);
-  void writeMicroseconds(uint8_t num, uint16_t Microseconds);
+class pcb9685 {
+	public:
+		pcb9685(const struct device * device)   {
+			m_i2c_dev = 0;
+			if (device && !device_is_ready(device)) {
+				m_i2c_dev = 0;
+			}
+			m_i2c_dev = device;
 
-  void setOscillatorFrequency(uint32_t freq);
-  uint32_t getOscillatorFrequency(void);
 
-private:
-  uint8_t _i2caddr;
-  TwoWire *_i2c;
-  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
+		};  
+		bool begin(uint8_t prescale = 0);
+		void reset();
+		void sleep();
+		void wakeup();
+		void setExtClk(uint8_t prescale);
+		void setPWMFreq(float freq);
+		void setOutputMode(bool totempole);
+		uint16_t getPWM(uint8_t num, bool off = false);
+		uint8_t setPWM(uint8_t num, uint16_t on, uint16_t off);
+		void setPin(uint8_t num, uint16_t val, bool invert = false);
+		uint8_t readPrescale(void);
+		void writeMicroseconds(uint8_t num, uint16_t Microseconds);
 
-  uint32_t _oscillator_freq;
-  uint8_t read8(uint8_t addr);
-  void write8(uint8_t addr, uint8_t d);
+		void setOscillatorFrequency(uint32_t freq);
+		uint32_t getOscillatorFrequency(void);
+
+	private:
+
+		uint32_t _oscillator_freq;
+		uint8_t read8(uint8_t addr);
+		void write8(uint8_t addr, uint8_t d);
+		const struct device * m_i2c_dev;
 };
-
 #endif

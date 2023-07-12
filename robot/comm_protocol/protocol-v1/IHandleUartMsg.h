@@ -22,8 +22,8 @@
 #include "protocol-v1/messages.h"
 
 namespace Simple {
-	using ParsingData = GenericParsingData<1024>;
-	using MsgToParse = Simple::Msg<ParsingData> ;
+	using ParsingData = Payload::GenericParsingData<1024>;
+	using MsgToParse = Msg<ParsingData> ;
 
 	class IHandleUartMsg  {
 		public:
