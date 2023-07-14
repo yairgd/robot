@@ -56,15 +56,19 @@ namespace Simple {
 							break;
 						}
 					case CmdId::SetMotorAngle:
-						{
-							// send response
-							Ack ack;
-							auto res_msg = ack();
-							int n = m_uart->Send(res_msg->buffer,res_msg->size()); 
-							(void)n;
-							
+						{	
 							Payload::ServoParams *di = (Payload::ServoParams*)(msg.data.buffer);	
-							m_motor->pushMessage(*di);
+							if (m_motor->pushMessage(*di) == 0) {
+								Ack ack;
+								auto res_msg = ack();
+								int n = m_uart->Send(res_msg->buffer,res_msg->size()); 
+								(void)n;
+							} else {
+								NotAck ack;
+								auto res_msg = ack();
+								int n = m_uart->Send(res_msg->buffer,res_msg->size()); 
+								(void)n;
+							}
 							break;
 
 						}

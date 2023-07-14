@@ -42,8 +42,9 @@ class Robot {
 			(void)n;
 		}
 
-		void setMotorAngle(ServoParams &servoParams) {
-			auto msg = servoParams();
+		void setServoParams(Payload::ServoParams &data) {
+			ServoParams servoParams;
+			auto msg = servoParams(data);
 			int n = m_uart->Send(msg->buffer,msg->size()); 
 			(void)n;
 		}	

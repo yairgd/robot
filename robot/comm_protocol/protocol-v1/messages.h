@@ -135,8 +135,7 @@ namespace Simple {
 	 */
 	struct ServoParams:public IMessageCreator<Payload::ServoParams, CmdId::SetMotorAngle> {
 		public:
-			std::shared_ptr<Msg<Payload::ServoParams>> operator() () {
-				Payload::ServoParams  data = {0} ;
+			std::shared_ptr<Msg<Payload::ServoParams>> operator() (Payload::ServoParams &data) {
 				return IMessageCreator::Create(data); 	
 			}
 	};

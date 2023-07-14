@@ -59,8 +59,14 @@ namespace Simple {
 						}
 					case CmdId::AckNack:
 						{
-							logger_print(LOG_INFO,"AckNack");
+							Payload::AckNack *di = (Payload::AckNack*)(msg.data.buffer);												  if (di->ack_nack)	{
+								logger_print(LOG_INFO,"Ack");
+							} else {
+								logger_print(LOG_INFO,"NotNack");
+							}
+
 						}
+						
 
 
 

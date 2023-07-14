@@ -28,8 +28,9 @@ class Motor {
 			m_msgq = msgq;
 		}
 		void setServoPulse(uint8_t n, double pulse);
-		void pushMessage(Simple::Payload::ServoParams  & motorAngle) {
-			k_msgq_put(m_msgq, &motorAngle, K_NO_WAIT);			
+		int pushMessage(Simple::Payload::ServoParams  & motorAngle) {
+			int e = k_msgq_put(m_msgq, &motorAngle, K_NO_WAIT);
+			return e;
 		}
 		void setup();
 		

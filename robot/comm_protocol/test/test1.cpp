@@ -84,13 +84,20 @@ void run_the_application() {
 		}
 		
 		// set servo location
-		ServoParams servoParams;
-		auto msg = servoParams();
-		msg->data.angle[0] = 40;
-		msg->data.update_bit = 1;
-		msg->data.min_pwm = 500;
-		msg->data.max_pwm = 2500;
-		robot->setMotorAngle(servoParams);
+		Simple::Payload::ServoParams data;
+		data.update_bit = 255;
+		data.min_pwm = 500;
+		data.max_pwm = 2700;
+		memset (data.angle,0,16);
+		robot->setServoParams(data);	
+		usleep(1000000);
+		for (int i=0; i < 180;  i+=10) {
+			memset (data.angle,i,16);
+
+
+			robot->setServoParams(data);
+//			usleep(100000);
+		}
 		
 		usleep(100000);
 		m_exit = true;		

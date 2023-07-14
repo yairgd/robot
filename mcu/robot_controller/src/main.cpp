@@ -74,24 +74,29 @@ int main(void)
 
 
 
-
+double map_angle (int min_pwm, int max_pwm, int angle) {
+	double min_ang=0;
+	double max_ang=180;
+	double pwm = (max_pwm-min_pwm)/(max_ang-min_ang) * angle + min_pwm;
+	pwm = pwm /  1000000; // move to uq
+	return pwm;	     
+}
 void servo_command_listenr(void *p1,void *p2, void *p3)
 {
-	int e;
 	Simple::Payload::ServoParams  servoParams;
 	Motor * motor = * ( (Motor **) p1); 
 
 	printk("servo_command_listenr\n");
 
 	motor->setup();
-	unsigned int c=0;
 	while (1) {
-		e = k_msgq_get(&sevo_msgq, &servoParams, K_FOREVER) ;
-		motor->setServoPulse(0,c == 0 ? 0.0025 : 0.0005 );
-		c = ~c;
-
-		int g=3;
-		g=g+1;
+		if (k_msgq_get(&sevo_msgq, &servoParams, K_FOREVER) == 0) {
+			for (int i = 0; i <16; i++) {
+				double c = map_angle(servoParams.min_pwm, servoParams.max_pwm , servoParams.angle[i]);
+				if (servoParams.update_bit & (1<<i))
+					motor->setServoPulse(i,c);
+			}
+		}
 	}
 	k_sleep(K_MSEC(2000));			
 }
@@ -103,6 +108,7 @@ K_THREAD_DEFINE(servo_command_listenr_id, STACKSIZE, servo_command_listenr, &g_m
 void message_in_listenr(void *p1,void *p2, void *p3)
 {
 	Motor * motor = *( (Motor **) p1); 
+	printk("message_in_listenr\n");
 
 	auto uart = Hal::GetUartZephyr(sl_uart2);
 	uart->Open();
