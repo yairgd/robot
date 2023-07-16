@@ -91,14 +91,22 @@ void run_the_application() {
 		memset (data.angle,0,16);
 		robot->setServoParams(data);	
 		usleep(1000000);
-		for (int i=0; i < 180;  i+=10) {
+		for (int i=0; i <= 180;  i+=10) {
 			memset (data.angle,i,16);
 
 
 			robot->setServoParams(data);
-//			usleep(100000);
+			usleep(100000);
 		}
-		
+		usleep(100000);
+
+	for (int i=180; i >= 0;  i-=10) {
+			memset (data.angle,i,16);
+
+
+			robot->setServoParams(data);
+			usleep(100000);
+		}	
 		usleep(100000);
 		m_exit = true;		
 		return;
